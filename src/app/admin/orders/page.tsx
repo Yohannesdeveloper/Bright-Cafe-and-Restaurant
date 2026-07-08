@@ -1,6 +1,5 @@
 'use client';
 
-import { Navigation } from '@/components/Navigation';
 import { OrderManagement } from '@/components/OrderManagement';
 import { useEffect, useState } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
@@ -28,32 +27,26 @@ export default function AdminOrdersPage() {
   };
 
   const mappedOrders = orders.map((o: any) => ({
-    id: o.id,
-    customer: o.customer,
-    table: o.table_number,
-    items: o.items || [],
-    total: o.total,
-    status: o.status,
-    time: new Date(o.created_at).toLocaleString(),
-    notes: o.notes,
+    id: o.id, customer: o.customer, table: o.table_number,
+    items: o.items || [], total: o.total, status: o.status,
+    time: new Date(o.created_at).toLocaleString(), notes: o.notes,
   }));
 
   if (authorized === null) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full" />
+      <div className="min-h-screen bg-[#050508] flex items-center justify-center">
+        <div className="relative">
+          <div className="w-14 h-14 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
+          <div className="w-14 h-14 border-2 border-[#D4AF37]/10 rounded-full absolute inset-0 animate-ping opacity-30" />
+        </div>
       </div>
     );
   }
-
   if (!authorized) return null;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <Navigation role="admin" />
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <OrderManagement orders={mappedOrders} onUpdateStatus={handleUpdateStatus as any} onViewDetails={handleViewDetails as any} />
-      </div>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <OrderManagement orders={mappedOrders} onUpdateStatus={handleUpdateStatus as any} onViewDetails={handleViewDetails as any} />
     </div>
   );
 }

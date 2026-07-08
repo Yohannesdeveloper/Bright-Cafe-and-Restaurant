@@ -27,7 +27,19 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   const [activeCategory, setActiveCategory] = useState<string>('');
 
   useEffect(() => {
-    getMenuItems().then((data) => { if (data.length > 0) setMenuItems(data); }).catch(() => {});
+    getMenuItems().then((data) => {
+      if (data.length > 0) {
+        const fallbackIds = new Set(FALLBACK_MENU.map(item => item.id));
+        const merged = FALLBACK_MENU.map(fbItem => {
+          const supabaseItem = data.find((d: any) => d.id === fbItem.id);
+          return supabaseItem || fbItem;
+        });
+        data.forEach((d: any) => {
+          if (!fallbackIds.has(d.id)) merged.push(d);
+        });
+        setMenuItems(merged);
+      }
+    }).catch(() => {});
     getRestaurantSettings().then(setSettings).catch(() => {});
   }, []);
 

@@ -1,59 +1,71 @@
 'use client';
 
-import { Navigation } from '@/components/Navigation';
 import { MenuManagement } from '@/components/MenuManagement';
 import { useEffect, useState } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
 import { getMenuItems, addMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/actions';
 import { FALLBACK_MENU } from '@/lib/menu-data';
 
+async function seedFallbackMenu() {
+  const items = FALLBACK_MENU.map(item => ({ ...item, available: true, rating: 0 }));
+  for (const item of items) {
+    try { await addMenuItem(item); } catch {}
+  }
+}
+
 export default function AdminMenuPage() {
   const [items, setItems] = useState<any[]>([]);
   const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    checkAdminAuth().then((authed) => {
+    checkAdminAuth().then(async (authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      getMenuItems().then((data) => {
-        if (data.length > 0) setItems(data);
-        else setItems(FALLBACK_MENU.map(item => ({ ...item, available: true })));
-      }).catch(() => setItems(FALLBACK_MENU.map(item => ({ ...item, available: true }))));
+      let data = await getMenuItems().catch(() => []);
+      await seedFallbackMenu();
+      data = await getMenuItems().catch(() => []);
+      setItems(data);
     });
   }, []);
-
   const handleAdd = async (item: any) => {
-    const { id, ...rest } = item;
-    await addMenuItem({ ...rest, rating: 0 });
-    setItems(await getMenuItems());
+    try {
+      const data = await addMenuItem({ ...item, rating: 0 });
+      setItems(prev => [...prev, { ...data, available: true }]);
+    } catch (e) {
+      alert('Failed to add item: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    }
   };
-
   const handleEdit = async (id: number, item: any) => {
-    await updateMenuItem(id, item);
-    setItems(await getMenuItems());
+    try {
+      await updateMenuItem(id, item);
+      setItems(prev => prev.map(i => i.id === id ? { ...i, ...item } : i));
+    } catch (e) {
+      alert('Failed to update item: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    }
   };
-
   const handleDelete = async (id: number) => {
-    await deleteMenuItem(id);
-    setItems(await getMenuItems());
+    try {
+      await deleteMenuItem(id);
+      setItems(prev => prev.filter(i => i.id !== id));
+    } catch (e) {
+      alert('Failed to delete item: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    }
   };
-
   if (authorized === null) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full" />
+      <div className="min-h-screen bg-[#050508] flex items-center justify-center">
+        <div className="relative">
+          <div className="w-14 h-14 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
+          <div className="w-14 h-14 border-2 border-[#D4AF37]/10 rounded-full absolute inset-0 animate-ping opacity-30" />
+        </div>
       </div>
     );
   }
-
   if (!authorized) return null;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <Navigation role="admin" />
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <MenuManagement items={items} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} />
-      </div>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <MenuManagement items={items} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );
 }

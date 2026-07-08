@@ -1,18 +1,13 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { GlassCard } from './GlassCard';
-import { Plus, Edit, Trash2, Search, Shield, ChefHat, Users, Mail, Phone, MapPin } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Edit, Trash2, Search, Shield, ChefHat, Users, Mail, Phone, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface StaffMember {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  role: 'admin' | 'manager' | 'chef' | 'waiter' | 'host';
-  status: 'active' | 'inactive';
-  joinDate: string;
+  id: number; name: string; email: string; phone: string;
+  role: 'admin' | 'manager' | 'chef' | 'waiter' | 'host'; status: 'active' | 'inactive'; joinDate: string;
 }
 
 interface StaffManagementProps {
@@ -22,328 +17,188 @@ interface StaffManagementProps {
   onDelete: (id: number) => void;
 }
 
+const roleConfig: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+  admin: { label: 'Admin', color: 'text-purple-400', bg: 'bg-purple-500/10', icon: Shield },
+  manager: { label: 'Manager', color: 'text-blue-400', bg: 'bg-blue-500/10', icon: Users },
+  chef: { label: 'Chef', color: 'text-orange-400', bg: 'bg-orange-500/10', icon: ChefHat },
+  waiter: { label: 'Waiter', color: 'text-emerald-400', bg: 'bg-emerald-500/10', icon: Users },
+  host: { label: 'Host', color: 'text-pink-400', bg: 'bg-pink-500/10', icon: Users },
+};
+
 export function StaffManagement({ staff, onAdd, onEdit, onDelete }: StaffManagementProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<'all' | StaffMember['role']>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<StaffMember | null>(null);
 
-  const filteredStaff = staff.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         member.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = selectedRole === 'all' || member.role === selectedRole;
-    return matchesSearch && matchesRole;
+  const filteredStaff = staff.filter(m => {
+    const q = searchQuery.toLowerCase();
+    return (m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)) && (selectedRole === 'all' || m.role === selectedRole);
   });
 
-  const roleCounts = {
-    all: staff.length,
-    admin: staff.filter(s => s.role === 'admin').length,
-    manager: staff.filter(s => s.role === 'manager').length,
-    chef: staff.filter(s => s.role === 'chef').length,
-    waiter: staff.filter(s => s.role === 'waiter').length,
-    host: staff.filter(s => s.role === 'host').length,
-  };
-
-  const getRoleIcon = (role: StaffMember['role']) => {
-    switch (role) {
-      case 'admin':
-        return <Shield className="w-4 h-4" />;
-      case 'manager':
-        return <Users className="w-4 h-4" />;
-      case 'chef':
-        return <ChefHat className="w-4 h-4" />;
-      case 'waiter':
-        return <Users className="w-4 h-4" />;
-      case 'host':
-        return <Users className="w-4 h-4" />;
-      default:
-        return <Users className="w-4 h-4" />;
-    }
-  };
-
-  const getRoleColor = (role: StaffMember['role']) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-purple-500/20 text-purple-500 border-purple-500/30';
-      case 'manager':
-        return 'bg-blue-500/20 text-blue-500 border-blue-500/30';
-      case 'chef':
-        return 'bg-orange-500/20 text-orange-500 border-orange-500/30';
-      case 'waiter':
-        return 'bg-green-500/20 text-green-500 border-green-500/30';
-      case 'host':
-        return 'bg-pink-500/20 text-pink-500 border-pink-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-500 border-gray-500/30';
-    }
-  };
-
-  const handleEdit = (member: StaffMember) => {
-    setEditingMember(member);
-    setIsModalOpen(true);
-  };
-
-  const handleAdd = () => {
-    setEditingMember(null);
-    setIsModalOpen(true);
-  };
+  const roles: ('all' | StaffMember['role'])[] = ['all', 'admin', 'manager', 'chef', 'waiter', 'host'];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-black dark:text-white mb-1">
-            Staff Management
-          </h2>
-          <p className="text-black/60 dark:text-white/60">
-            Manage restaurant staff and their roles
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/20 flex items-center justify-center">
+            <Users className="w-5 h-5 text-purple-400" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-tight">Staff</h1>
+            <p className="text-xs text-white/40">{staff.length} members</p>
+          </div>
         </div>
-        
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleAdd}
-          className="px-6 py-3 bg-[#D4AF37] text-white rounded-full font-medium hover:bg-[#B8962F] transition-colors flex items-center space-x-2"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Add Staff Member</span>
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+          onClick={() => { setEditingMember(null); setIsModalOpen(true); }}
+          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-black font-semibold text-sm hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-[#D4AF37]/20">
+          <Plus className="w-4 h-4" /> Add Staff
         </motion.button>
       </div>
 
-      {/* Role Filters */}
-      <div className="flex flex-wrap gap-3">
-        {(['all', 'admin', 'manager', 'chef', 'waiter', 'host'] as const).map((role) => (
-          <button
-            key={role}
-            onClick={() => setSelectedRole(role)}
-            className={`px-4 py-2 rounded-full border-2 transition-all flex items-center space-x-2 ${
-              selectedRole === role
-                ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
-                : 'bg-transparent text-black dark:text-white border-[#D4AF37]/30 hover:border-[#D4AF37]'
-            }`}
-          >
-            {getRoleIcon(role === 'all' ? 'admin' : role)}
-            <span className="capitalize">{role}</span>
-            <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
-              {roleCounts[role]}
-            </span>
-          </button>
-        ))}
+      <div className="flex flex-wrap gap-2">
+        {roles.map((role) => {
+          const active = selectedRole === role;
+          const label = role === 'all' ? 'All' : role.charAt(0).toUpperCase() + role.slice(1);
+          const count = role === 'all' ? staff.length : staff.filter(s => s.role === role).length;
+          return (
+            <button key={role} onClick={() => setSelectedRole(role)}
+              className={cn('px-3.5 py-2 rounded-xl text-xs font-medium transition-all border',
+                active ? 'border-[#D4AF37]/40 bg-gradient-to-r from-[#D4AF37]/15 to-transparent text-[#D4AF37]' : 'border-white/[0.06] text-white/40 hover:text-white/60 hover:bg-white/[0.04]'
+              )}>
+              {label} <span className={cn('ml-1.5 px-1.5 py-0.5 rounded text-[10px]', active ? 'bg-[#D4AF37]/20' : 'bg-white/[0.06]')}>{count}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Search */}
-      <GlassCard className="p-4">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#D4AF37] w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search staff by name or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-white/60 dark:bg/black/60 backdrop-blur-xl border-2 border-[#D4AF37]/30 rounded-full text-black dark:text-white placeholder-black/40 dark:placeholder-white/40 focus:outline-none focus:border-[#D4AF37] transition-all"
-          />
-        </div>
-      </GlassCard>
-
-      {/* Staff Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredStaff.map((member, index) => (
-          <motion.div
-            key={member.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <GlassCard className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center">
-                    <span className="text-xl font-bold text-[#D4AF37]">
-                      {member.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">
-                      {member.name}
-                    </h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getRoleColor(member.role)}`}>
-                      <span className="capitalize">{member.role}</span>
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="flex space-x-2">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleEdit(member)}
-                    className="p-2 bg-white/80 dark:bg/black/80 backdrop-blur-sm rounded-full"
-                  >
-                    <Edit className="w-4 h-4 text-[#D4AF37]" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => onDelete(member.id)}
-                    className="p-2 bg-white/80 dark:bg/black/80 backdrop-blur-sm rounded-full"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </motion.button>
-                </div>
-              </div>
-
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center space-x-2 text-sm">
-                  <Mail className="w-4 h-4 text-[#D4AF37]" />
-                  <span className="text-black dark:text-white">{member.email}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <Phone className="w-4 h-4 text-[#D4AF37]" />
-                  <span className="text-black dark:text-white">{member.phone}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <MapPin className="w-4 h-4 text-[#D4AF37]" />
-                  <span className="text-black dark:text-white">Joined {member.joinDate}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-[#D4AF37]/20">
-                <span className={`text-sm font-medium ${
-                  member.status === 'active' ? 'text-green-500' : 'text-red-500'
-                }`}>
-                  {member.status === 'active' ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-            </GlassCard>
-          </motion.div>
-        ))}
+      <div className="relative group">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-[#D4AF37] transition-colors z-10" />
+        <input type="text" placeholder="Search staff..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+          className="relative w-full pl-11 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all" />
       </div>
 
-      {/* Add/Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <GlassCard className="w-full max-w-md">
-            <div className="p-6">
-              <h3 className="text-2xl font-bold text-black dark:text-white mb-6">
-                {editingMember ? 'Edit Staff Member' : 'Add New Staff'}
-              </h3>
-              
-              <form className="space-y-6" onSubmit={(e) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AnimatePresence mode="popLayout">
+          {filteredStaff.map((member, i) => {
+            const rc = roleConfig[member.role] || roleConfig.waiter;
+            const RoleIcon = rc.icon;
+            return (
+              <motion.div key={member.id} layout
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ delay: i * 0.03 }}
+                className="group rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-transparent p-5 hover:border-white/[0.12] transition-all"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/20 flex items-center justify-center">
+                      <span className="text-sm font-bold text-purple-400">{member.name.charAt(0)}</span>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">{member.name}</h3>
+                      <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium', rc.bg, rc.color)}>
+                        <RoleIcon className="w-3 h-3" /> {rc.label}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => { setEditingMember(member); setIsModalOpen(true); }}
+                      className="p-1.5 rounded-lg hover:bg-white/[0.06] text-white/40 hover:text-[#D4AF37] transition-all"><Edit className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => onDelete(member.id)}
+                      className="p-1.5 rounded-lg hover:bg-white/[0.06] text-white/40 hover:text-red-400 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-white/50"><Mail className="w-3.5 h-3.5 text-white/30" />{member.email}</div>
+                  <div className="flex items-center gap-2 text-white/50"><Phone className="w-3.5 h-3.5 text-white/30" />{member.phone}</div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                  <span className={cn('text-xs font-medium', member.status === 'active' ? 'text-emerald-400' : 'text-red-400')}>
+                    {member.status === 'active' ? 'Active' : 'Inactive'}
+                  </span>
+                  <span className="text-xs text-white/30">Joined {member.joinDate}</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {filteredStaff.length === 0 && (
+        <div className="text-center py-16"><Users className="w-12 h-12 text-white/10 mx-auto mb-3" /><p className="text-sm text-white/30">No staff found</p></div>
+      )}
+
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#0a0a12] to-[#050508] p-6 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-white">{editingMember ? 'Edit Staff' : 'Add Staff'}</h2>
+                <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center text-white/40 hover:text-white transition-all"><X className="w-4 h-4" /></button>
+              </div>
+              <form className="space-y-5" onSubmit={(e) => {
                 e.preventDefault();
                 const data = new FormData(e.target as HTMLFormElement);
-                const name = data.get('name') as string;
-                const email = data.get('email') as string;
-                const phone = data.get('phone') as string;
-                const role = data.get('role') as StaffMember['role'];
-                const status = data.get('status') as StaffMember['status'];
-
-                if (editingMember) {
-                  onEdit(editingMember.id, { name, email, phone, role, status });
-                } else {
-                  onAdd({ name, email, phone, role, status, joinDate: new Date().toISOString().split('T')[0] });
-                }
+                if (editingMember) onEdit(editingMember.id, { name: data.get('name') as string, email: data.get('email') as string, phone: data.get('phone') as string, role: data.get('role') as any, status: data.get('status') as any });
+                else onAdd({ name: data.get('name') as string, email: data.get('email') as string, phone: data.get('phone') as string, role: data.get('role') as any, status: data.get('status') as any, joinDate: new Date().toISOString().split('T')[0] });
                 setIsModalOpen(false);
               }}>
                 <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    defaultValue={editingMember?.name}
-                    className="w-full px-4 py-3 bg-white/60 dark:bg/black/60 backdrop-blur-xl border-2 border-[#D4AF37]/30 rounded-xl text-black dark:text-white focus:outline-none focus:border-[#D4AF37] transition-all"
-                    placeholder="Enter full name"
-                    required
-                  />
+                  <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Full Name</label>
+                  <input type="text" name="name" defaultValue={editingMember?.name}
+                    className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all" required />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    defaultValue={editingMember?.email}
-                    className="w-full px-4 py-3 bg-white/60 dark:bg/black/60 backdrop-blur-xl border-2 border-[#D4AF37]/30 rounded-xl text-black dark:text-white focus:outline-none focus:border-[#D4AF37] transition-all"
-                    placeholder="staff@example.com"
-                    required
-                  />
+                  <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Email</label>
+                  <input type="email" name="email" defaultValue={editingMember?.email}
+                    className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all" required />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    defaultValue={editingMember?.phone}
-                    className="w-full px-4 py-3 bg-white/60 dark:bg/black/60 backdrop-blur-xl border-2 border-[#D4AF37]/30 rounded-xl text-black dark:text-white focus:outline-none focus:border-[#D4AF37] transition-all"
-                    placeholder="+1 234 567 890"
-                  />
+                  <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Phone</label>
+                  <input type="tel" name="phone" defaultValue={editingMember?.phone}
+                    className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all" />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                    Role
-                  </label>
-                  <select
-                    name="role"
-                    defaultValue={editingMember?.role || 'waiter'}
-                    className="w-full px-4 py-3 bg-white/60 dark:bg/black/60 backdrop-blur-xl border-2 border-[#D4AF37]/30 rounded-xl text-black dark:text-white focus:outline-none focus:border-[#D4AF37] transition-all"
-                    required
-                  >
-                    <option value="admin" className="bg-white dark:bg-black">Admin</option>
-                    <option value="manager" className="bg-white dark:bg/black">Manager</option>
-                    <option value="chef" className="bg-white dark:bg/black">Chef</option>
-                    <option value="waiter" className="bg-white dark:bg/black">Waiter</option>
-                    <option value="host" className="bg-white dark:bg/black">Host</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Role</label>
+                    <div className="relative">
+                      <select name="role" defaultValue={editingMember?.role || 'waiter'}
+                        className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm appearance-none focus:outline-none focus:border-[#D4AF37]/50 transition-all cursor-pointer">
+                        <option value="admin" className="bg-[#0a0a12]">Admin</option>
+                        <option value="manager" className="bg-[#0a0a12]">Manager</option>
+                        <option value="chef" className="bg-[#0a0a12]">Chef</option>
+                        <option value="waiter" className="bg-[#0a0a12]">Waiter</option>
+                        <option value="host" className="bg-[#0a0a12]">Host</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Status</label>
+                    <div className="relative">
+                      <select name="status" defaultValue={editingMember?.status || 'active'}
+                        className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm appearance-none focus:outline-none focus:border-[#D4AF37]/50 transition-all cursor-pointer">
+                        <option value="active" className="bg-[#0a0a12]">Active</option>
+                        <option value="inactive" className="bg-[#0a0a12]">Inactive</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+                    </div>
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    defaultValue={editingMember?.status || 'active'}
-                    className="w-full px-4 py-3 bg-white/60 dark:bg/black/60 backdrop-blur-xl border-2 border-[#D4AF37]/30 rounded-xl text-black dark:text-white focus:outline-none focus:border-[#D4AF37] transition-all"
-                    required
-                  >
-                    <option value="active" className="bg-white dark:bg/black">Active</option>
-                    <option value="inactive" className="bg-white dark:bg/black">Inactive</option>
-                  </select>
-                </div>
-
-                <div className="flex space-x-4 pt-4">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-6 py-3 border-2 border-[#D4AF37]/30 text-black dark:text-white rounded-full font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                  >
-                    Cancel
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-[#D4AF37] text-white rounded-full font-medium hover:bg-[#B8962F] transition-colors"
-                  >
-                    {editingMember ? 'Update Staff' : 'Add Staff'}
-                  </motion.button>
+                <div className="flex gap-3 pt-2">
+                  <button type="button" onClick={() => setIsModalOpen(false)}
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-white/[0.08] text-white/60 text-sm font-medium hover:bg-white/[0.04] transition-all">Cancel</button>
+                  <button type="submit"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-black font-semibold text-sm hover:brightness-110 transition-all">
+                    {editingMember ? 'Update' : 'Add Staff'}</button>
                 </div>
               </form>
-            </div>
-          </GlassCard>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
