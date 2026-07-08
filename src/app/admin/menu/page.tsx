@@ -15,7 +15,10 @@ export default function AdminMenuPage() {
     checkAdminAuth().then((authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      getMenuItems().then((data) => { if (data.length > 0) setItems(data); else setItems(FALLBACK_MENU); }).catch(() => setItems(FALLBACK_MENU));
+      getMenuItems().then((data) => {
+        if (data.length > 0) setItems(data);
+        else setItems(FALLBACK_MENU.map(item => ({ ...item, available: true })));
+      }).catch(() => setItems(FALLBACK_MENU.map(item => ({ ...item, available: true }))));
     });
   }, []);
 
