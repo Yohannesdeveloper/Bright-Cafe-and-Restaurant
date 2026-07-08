@@ -6,13 +6,6 @@ import { checkAdminAuth } from '@/lib/admin-auth';
 import { getMenuItems, addMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/actions';
 import { FALLBACK_MENU } from '@/lib/menu-data';
 
-async function seedFallbackMenu() {
-  const items = FALLBACK_MENU.map(item => ({ ...item, available: true, rating: 0 }));
-  for (const item of items) {
-    try { await addMenuItem(item); } catch {}
-  }
-}
-
 export default function AdminMenuPage() {
   const [items, setItems] = useState<any[]>([]);
   const [authorized, setAuthorized] = useState<boolean | null>(null);
@@ -21,10 +14,13 @@ export default function AdminMenuPage() {
     checkAdminAuth().then(async (authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      let data = await getMenuItems().catch(() => []);
-      await seedFallbackMenu();
-      data = await getMenuItems().catch(() => []);
-      setItems(data);
+      try {
+        const data = await getMenuItems();
+        if (data.length > 0) setItems(data);
+        else setItems(FALLBACK_MENU.map(item => ({ ...item, available: true })));
+      } catch {
+        setItems(FALLBACK_MENU.map(item => ({ ...item, available: true })));
+      }
     });
   }, []);
   const handleAdd = async (item: any) => {
