@@ -32,7 +32,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
         const fallbackIds = new Set(FALLBACK_MENU.map(item => item.id));
         const merged = FALLBACK_MENU.map(fbItem => {
           const supabaseItem = data.find((d: any) => d.id === fbItem.id);
-          return supabaseItem || fbItem;
+          return { ...fbItem, available: true, ...supabaseItem };
         });
         data.forEach((d: any) => {
           if (!fallbackIds.has(d.id)) merged.push(d);
@@ -193,24 +193,33 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
                   key={item.id}
                   className="flex items-stretch gap-2 rounded-2xl bg-white dark:bg-neutral-900 p-1.5 sm:p-2"
                 >
-                  <button
-                    type="button"
-                    onClick={() => handleItemClick(item)}
-                    className="h-full max-h-[115px] min-h-[6.5625rem] w-[6.5625rem] shrink-0 cursor-zoom-in overflow-hidden rounded-xl border border-black/10 dark:border-white/10 sm:max-h-[8.4375rem]"
-                  >
-                    {item.image?.startsWith('http') ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-cover object-center"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-4xl">
-                        {item.image}
+                  <div className="relative h-full max-h-[115px] min-h-[6.5625rem] w-[6.5625rem] shrink-0 sm:max-h-[8.4375rem]">
+                    <button
+                      type="button"
+                      onClick={() => handleItemClick(item)}
+                      className="h-full w-full overflow-hidden rounded-xl border border-black/10 dark:border-white/10 cursor-zoom-in"
+                    >
+                      <div className="h-full w-full">
+                        {item.image?.startsWith('http') ? (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-full w-full object-cover object-center"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-4xl">
+                            {item.image}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                    {!item.available && (
+                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                        <span className="text-white/80 text-xs font-semibold px-2 py-1 rounded-full bg-red-500/20 border border-red-500/30">Unavailable</span>
                       </div>
                     )}
-                  </button>
+                  </div>
                   <div className="flex min-w-0 flex-1 flex-col justify-between gap-y-1 px-1.5 py-1">
                     <button
                       type="button"
@@ -225,11 +234,16 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
                       </span>
                       <button
                         type="button"
+                        disabled={!item.available}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleAddToCart(item, 1, []);
+                          if (item.available) handleAddToCart(item, 1, []);
                         }}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#D4AF37] text-white shadow-sm transition hover:opacity-90 active:scale-90"
+                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full shadow-sm transition active:scale-90 ${
+                          item.available
+                            ? 'bg-[#D4AF37] text-white hover:opacity-90'
+                            : 'bg-white/10 text-white/30 cursor-not-allowed'
+                        }`}
                         aria-label={`Add ${item.name} to order`}
                       >
                         <Plus className="h-4 w-4" />
