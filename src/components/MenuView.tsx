@@ -23,24 +23,14 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [menuItems, setMenuItems] = useState<any[]>(FALLBACK_MENU);
+  const [menuItems, setMenuItems] = useState<any[]>(FALLBACK_MENU.map(i => ({ ...i, available: true })));
   const [settings, setSettings] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState<string>('');
 
   const fetchAndMergeMenu = useCallback(async () => {
     try {
       const data = await getMenuItems();
-      if (data.length > 0) {
-        const fallbackIds = new Set(FALLBACK_MENU.map(item => item.id));
-        const merged = FALLBACK_MENU.map(fbItem => {
-          const supabaseItem = data.find((d: any) => d.id === fbItem.id);
-          return { ...fbItem, available: true, ...supabaseItem };
-        });
-        data.forEach((d: any) => {
-          if (!fallbackIds.has(d.id)) merged.push(d);
-        });
-        setMenuItems(merged);
-      }
+      if (data.length > 0) setMenuItems(data);
     } catch {}
   }, []);
 
