@@ -3,28 +3,23 @@
 import { cookies } from 'next/headers';
 import { supabase } from './supabase';
 
-export async function verifyWaiter(email: string) {
-  const { data, error } = await supabase
-    .from('staff')
-    .select('id, name, email, role, status')
-    .eq('email', email)
-    .eq('role', 'waiter')
-    .eq('status', 'active')
-    .single();
+const WAITER_EMAIL = process.env.WAITER_EMAIL || 'waiter@brightcafe.com';
+const WAITER_PASSWORD = process.env.WAITER_PASSWORD || 'waiter123';
 
-  if (error || !data) {
-    return { success: false, error: 'No active waiter found with that email' };
+export async function verifyWaiter(email: string, password: string) {
+  if (email !== WAITER_EMAIL || password !== WAITER_PASSWORD) {
+    return { success: false, error: 'Invalid email or password' };
   }
 
   const cookieStore = await cookies();
-  cookieStore.set('waiter_session', JSON.stringify({ id: data.id, name: data.name, email: data.email }), {
+  cookieStore.set('waiter_session', JSON.stringify({ name: 'Waiter', email }), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 60 * 60 * 8,
     path: '/',
   });
-  return { success: true, name: data.name };
+  return { success: true, name: 'Waiter' };
 }
 
 export async function logoutWaiter() {

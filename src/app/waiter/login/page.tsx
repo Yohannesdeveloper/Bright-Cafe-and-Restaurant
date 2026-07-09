@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Mail, ChefHat, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ChefHat, Sparkles } from 'lucide-react';
 import { verifyWaiter } from '@/lib/waiter-auth';
 
 export default function WaiterLogin() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +19,7 @@ export default function WaiterLogin() {
     setError('');
     setLoading(true);
     try {
-      const result = await verifyWaiter(email);
+      const result = await verifyWaiter(email, password);
       if (result.success) {
         router.push('/waiter/orders');
       } else {
@@ -60,7 +62,7 @@ export default function WaiterLogin() {
 
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-white mb-2">Waiter Login</h1>
-              <p className="text-sm text-white/40">Sign in with your staff email</p>
+              <p className="text-sm text-white/40">Sign in with your staff credentials</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -69,46 +71,47 @@ export default function WaiterLogin() {
                 <div className="relative group">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#D4AF37]/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-[#D4AF37] transition-colors z-10" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                     className="relative w-full pl-11 pr-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-white/[0.06] transition-all text-sm"
-                    placeholder="waiter@email.com"
-                    required
-                  />
+                    placeholder="waiter@email.com" required />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-white/50 mb-2 uppercase tracking-wider">Password</label>
+                <div className="relative group">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#D4AF37]/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-[#D4AF37] transition-colors z-10" />
+                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}
+                    className="relative w-full pl-11 pr-11 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-white/[0.06] transition-all text-sm"
+                    placeholder="Enter password" required />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-[#D4AF37] transition-colors z-10">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
               {error && (
                 <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-                  className="text-red-400 text-xs text-center bg-red-500/10 py-2 rounded-lg border border-red-500/20"
-                >
+                  className="text-red-400 text-xs text-center bg-red-500/10 py-2 rounded-lg border border-red-500/20">
                   {error}
                 </motion.p>
               )}
 
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                type="submit"
-                disabled={loading}
-                className="relative w-full py-3.5 rounded-xl font-semibold text-sm text-white overflow-hidden group"
-              >
+              <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                type="submit" disabled={loading}
+                className="relative w-full py-3.5 rounded-xl font-semibold text-sm text-white overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37] via-[#E5C158] to-[#D4AF37] bg-[length:200%_100%] animate-[shimmer_3s_ease_infinite] group-hover:brightness-110 transition-all" />
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   {loading ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    'Sign In'
-                  )}
+                  ) : 'Sign In'}
                 </span>
               </motion.button>
             </form>
 
-            <p className="text-center text-xs text-white/20 mt-6">
-              Authorized staff only
-            </p>
+            <p className="text-center text-xs text-white/20 mt-6">Authorized staff only</p>
           </div>
         </div>
       </motion.div>

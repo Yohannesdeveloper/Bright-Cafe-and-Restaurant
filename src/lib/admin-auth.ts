@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@luxurydining.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@brightcafe.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 export async function verifyAdmin(email: string, password: string) {

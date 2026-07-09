@@ -79,7 +79,7 @@ export default function AdminLogin() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="relative w-full pl-11 pr-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-white/[0.06] transition-all text-sm"
-                    placeholder="admin@luxurydining.com"
+                    placeholder="admin@brightcafe.com"
                     required
                   />
                 </div>
