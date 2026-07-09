@@ -176,8 +176,3 @@ export async function saveRestaurantSettings(settings: Record<string, unknown>) 
   if (error) throw new Error(error.message);
   return data;
 }
-
-export async function deleteRestaurantSettings() {
-  const { error } = await supabase.from('restaurant_settings').delete().neq('id', 0);
-  if (error) throw new Error(error.message);
-}

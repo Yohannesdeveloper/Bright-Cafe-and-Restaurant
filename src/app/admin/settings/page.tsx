@@ -3,7 +3,7 @@
 import { RestaurantSettings } from '@/components/RestaurantSettings';
 import { useEffect, useState } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
-import { getRestaurantSettings, saveRestaurantSettings, deleteRestaurantSettings } from '@/lib/actions';
+import { getRestaurantSettings, saveRestaurantSettings } from '@/lib/actions';
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<any>(null);
@@ -50,13 +50,6 @@ export default function AdminSettingsPage() {
     facebook: settings.facebook || '',
   } : null;
 
-  const handleDelete = async () => {
-    if (!confirm('Delete all restaurant settings? This cannot be undone.')) return;
-    await deleteRestaurantSettings();
-    setSettings(null);
-    alert('Settings deleted. Refresh to restore defaults.');
-  };
-
   if (authorized === null || !defaultSettings) {
     return (
       <div className="min-h-screen bg-[#050508] flex items-center justify-center">
@@ -70,14 +63,8 @@ export default function AdminSettingsPage() {
   if (!authorized) return null;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-4">
+    <div className="p-4 sm:p-6 lg:p-8">
       <RestaurantSettings settings={defaultSettings} onSave={handleSave} />
-      <div className="flex justify-end">
-        <button onClick={handleDelete}
-          className="px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-all">
-          Delete Settings
-        </button>
-      </div>
     </div>
   );
 }
