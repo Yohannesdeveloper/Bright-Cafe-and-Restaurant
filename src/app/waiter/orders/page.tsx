@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, CheckCircle, ChefHat, Clock, XCircle, ArrowRight } from 'lucide-react';
 import { getOrders, updateOrderStatus, deleteCompletedOrders } from '@/lib/actions';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { useOrderReadyNotifications, OrderReadyToast } from '@/components/OrderReadyNotification';
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; dot: string; next?: string; nextLabel?: string }> = {
   confirmed: { label: 'New', color: 'text-blue-400', bg: 'bg-blue-500/10', dot: 'bg-blue-400', next: 'preparing', nextLabel: 'Start Preparing' },
@@ -42,6 +43,8 @@ export default function WaiterOrdersPage() {
     await updateOrderStatus(id, status);
   };
 
+  const { notifications, dismiss } = useOrderReadyNotifications(orders);
+
   const filtered = orders.filter(o => activeTab === 'all' || (o.status !== 'served' && o.status !== 'cancelled'));
   const activeCount = orders.filter(o => o.status !== 'served' && o.status !== 'cancelled').length;
 
@@ -54,6 +57,7 @@ export default function WaiterOrdersPage() {
   }
 
   return (
+    <>
     <div className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -151,6 +155,15 @@ export default function WaiterOrdersPage() {
           })}
         </div>
       )}
-    </div>
+      </div>
+
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+        <AnimatePresence>
+          {notifications.map(n => (
+            <OrderReadyToast key={n.id} notification={n} onDismiss={dismiss} />
+          ))}
+        </AnimatePresence>
+      </div>
+    </>
   );
 }

@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ShoppingBag, Clock, CheckCircle, ChefHat, TrendingUp, ArrowRight } from 'lucide-react';
 import { getOrders } from '@/lib/actions';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { useOrderReadyNotifications, OrderReadyToast } from '@/components/OrderReadyNotification';
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   confirmed: { label: 'New', color: 'text-blue-400', bg: 'bg-blue-500/10' },
@@ -39,6 +40,8 @@ export default function WaiterDashboard() {
     return () => { supabase.removeChannel(channel); clearInterval(interval); };
   }, [fetchOrders]);
 
+  const { notifications, dismiss } = useOrderReadyNotifications(orders);
+
   const activeOrders = orders.filter(o => o.status !== 'served' && o.status !== 'cancelled');
   const todayOrders = orders.filter(o => {
     const d = new Date(o.created_at);
@@ -67,6 +70,7 @@ export default function WaiterDashboard() {
   }
 
   return (
+    <>
     <div className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -138,6 +142,15 @@ export default function WaiterDashboard() {
           )}
         </div>
       )}
-    </div>
+      </div>
+
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+        <AnimatePresence>
+          {notifications.map(n => (
+            <OrderReadyToast key={n.id} notification={n} onDismiss={dismiss} />
+          ))}
+        </AnimatePresence>
+      </div>
+    </>
   );
 }
