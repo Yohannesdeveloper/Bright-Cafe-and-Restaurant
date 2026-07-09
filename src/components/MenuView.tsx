@@ -26,6 +26,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   const [menuItems, setMenuItems] = useState<any[]>(FALLBACK_MENU.map(i => ({ ...i, available: true })));
   const [settings, setSettings] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchAndMergeMenu = useCallback(async () => {
     try {
@@ -47,8 +48,12 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
     getRestaurantSettings().then(setSettings).catch(() => {});
   }, []);
 
+  const filteredItems = menuItems.filter(item => {
+    const q = searchQuery.toLowerCase();
+    return !q || item.name.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q);
+  });
   const groupedItems: Record<string, any[]> = {};
-  menuItems.forEach(item => {
+  filteredItems.forEach(item => {
     if (!groupedItems[item.category]) groupedItems[item.category] = [];
     groupedItems[item.category].push(item);
   });
@@ -149,7 +154,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
       </header>
 
       {/* Restaurant Hero */}
-      <div className="px-4 pb-10 pt-4 text-center">
+      <div className="px-4 pb-6 pt-4 text-center">
         <img src="/PNG-01.png" alt="Logo" className="h-16 w-auto mx-auto mb-4" />
         <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-white">
           {settings?.name || 'Bright Cafe and Restaurant'}
@@ -159,6 +164,17 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
             {settings.description}
           </p>
         )}
+      </div>
+
+      {/* Search Bar */}
+      <div className="mx-auto max-w-4xl px-4 pb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search menu items..."
+          className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 text-sm text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors"
+        />
       </div>
 
       {/* Category Tabs */}
@@ -184,6 +200,11 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
 
       {/* Menu Sections */}
       <main className="mx-auto max-w-4xl px-4 pb-20 pt-5">
+        {filteredItems.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-black/40 dark:text-white/40 text-sm">No items match your search</p>
+          </div>
+        )}
         {categoryNames.map(cat => (
           <section
             key={cat}
