@@ -34,7 +34,8 @@ export default function WaiterOrdersPage() {
     const channel = supabase.channel('waiter-orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(fetchOrders, 5000);
+    return () => { supabase.removeChannel(channel); clearInterval(interval); };
   }, [fetchOrders]);
 
   const handleStatus = async (id: string, status: string) => {

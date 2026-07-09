@@ -35,7 +35,8 @@ export default function WaiterDashboard() {
     const channel = supabase.channel('waiter-dashboard')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(fetchOrders, 5000);
+    return () => { supabase.removeChannel(channel); clearInterval(interval); };
   }, [fetchOrders]);
 
   const activeOrders = orders.filter(o => o.status !== 'served' && o.status !== 'cancelled');
