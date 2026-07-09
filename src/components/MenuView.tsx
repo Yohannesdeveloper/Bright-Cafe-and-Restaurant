@@ -298,16 +298,16 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
             <div className="text-center md:text-left">
               <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Follow Us</h3>
               <div className="flex items-center justify-center md:justify-start gap-4">
-                <a href={settings?.website || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                <a href={settings?.website || '#'} target="_blank" rel="noopener noreferrer" title="Website" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
                   <Globe className="h-5 w-5" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                <a href={(settings as any)?.instagram || '#'} target="_blank" rel="noopener noreferrer" title="Instagram" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
                   <Camera className="h-5 w-5" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                <a href={(settings as any)?.telegram || '#'} target="_blank" rel="noopener noreferrer" title="Telegram" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
                   <MessageCircle className="h-5 w-5" />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                <a href={(settings as any)?.tiktok || '#'} target="_blank" rel="noopener noreferrer" title="TikTok" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
                   <Play className="h-5 w-5" />
                 </a>
               </div>

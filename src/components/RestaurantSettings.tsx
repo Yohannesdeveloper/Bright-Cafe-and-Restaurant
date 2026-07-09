@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Save, MapPin, Phone, Mail, Clock, Globe, Image as ImageIcon, Settings } from 'lucide-react';
+import { Save, MapPin, Phone, Mail, Clock, Globe, Image as ImageIcon, Settings, Camera, MessageCircle, Play } from 'lucide-react';
 import { useState } from 'react';
 
 interface RestaurantSettingsProps {
@@ -9,6 +9,7 @@ interface RestaurantSettingsProps {
     name: string; description: string; address: string; phone: string; email: string; website: string;
     openingHours: { weekdays: string; weekends: string; };
     logo: string; coverImage: string;
+    instagram?: string; telegram?: string; tiktok?: string; youtube?: string;
   };
   onSave: (settings: any) => void;
 }
@@ -114,6 +115,51 @@ export function RestaurantSettings({ settings, onSave }: RestaurantSettingsProps
               <input type="text" value={localSettings.openingHours.weekends}
                 onChange={(e) => handleNestedChange('openingHours', 'weekends', e.target.value)}
                 className="w-full pl-11 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Social Media */}
+      <div className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.03] to-transparent p-6">
+        <h2 className="text-sm font-semibold text-white mb-5">Social Media Links</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Instagram</label>
+            <div className="relative">
+              <Camera className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <input type="url" value={(localSettings as any).instagram || ''} onChange={(e) => handleChange('instagram', e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
+                placeholder="https://instagram.com/yourpage" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Telegram</label>
+            <div className="relative">
+              <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <input type="url" value={(localSettings as any).telegram || ''} onChange={(e) => handleChange('telegram', e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
+                placeholder="https://t.me/yourpage" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">TikTok</label>
+              <div className="relative">
+                <Play className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                <input type="url" value={(localSettings as any).tiktok || ''} onChange={(e) => handleChange('tiktok', e.target.value)}
+                  className="w-full pl-11 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
+                  placeholder="https://tiktok.com/@yourpage" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">YouTube</label>
+              <div className="relative">
+                <Play className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                <input type="url" value={(localSettings as any).youtube || ''} onChange={(e) => handleChange('youtube', e.target.value)}
+                  className="w-full pl-11 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
+                  placeholder="https://youtube.com/@yourpage" />
+              </div>
             </div>
           </div>
         </div>

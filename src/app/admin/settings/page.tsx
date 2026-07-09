@@ -24,6 +24,10 @@ export default function AdminSettingsPage() {
       opening_hours_weekdays: data.openingHours?.weekdays,
       opening_hours_weekends: data.openingHours?.weekends,
       logo: data.logo, cover_image: data.coverImage,
+      instagram: data.instagram || '',
+      telegram: data.telegram || '',
+      tiktok: data.tiktok || '',
+      youtube: data.youtube || '',
     };
     await saveRestaurantSettings(payload);
     alert('Settings saved!');
@@ -38,6 +42,10 @@ export default function AdminSettingsPage() {
       weekends: settings.opening_hours_weekends || '8:00 AM - 12:00 AM',
     },
     logo: settings.logo || '', coverImage: settings.cover_image || '',
+    instagram: settings.instagram || '',
+    telegram: settings.telegram || '',
+    tiktok: settings.tiktok || '',
+    youtube: settings.youtube || '',
   } : null;
 
   if (authorized === null || !defaultSettings) {
