@@ -3,7 +3,7 @@
 import { OrderManagement } from '@/components/OrderManagement';
 import { useEffect, useState } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
-import { getOrders, updateOrderStatus } from '@/lib/actions';
+import { getOrders, updateOrderStatus, deleteCompletedOrders } from '@/lib/actions';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -32,6 +32,11 @@ export default function AdminOrdersPage() {
     time: new Date(o.created_at).toLocaleString(), notes: o.notes,
   }));
 
+  const handleClearHistory = async () => {
+    await deleteCompletedOrders();
+    setOrders(await getOrders());
+  };
+
   if (authorized === null) {
     return (
       <div className="min-h-screen bg-[#050508] flex items-center justify-center">
@@ -46,6 +51,12 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-white/90">All Orders</h2>
+        <button onClick={handleClearHistory} className="px-4 py-2 text-sm rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
+          Clear Completed History
+        </button>
+      </div>
       <OrderManagement orders={mappedOrders} onUpdateStatus={handleUpdateStatus as any} onViewDetails={handleViewDetails as any} />
     </div>
   );
