@@ -10,9 +10,13 @@ export async function getMenuItems() {
 }
 
 export async function addMenuItem(item: Record<string, unknown>) {
-  const { data, error } = await supabase.from('menu_items').insert(item).select();
-  if (error) throw new Error(JSON.stringify({ message: error.message, code: error.code, details: error.details }));
-  return data?.[0] || data;
+  try {
+    const { data, error } = await supabase.from('menu_items').insert(item).select();
+    if (error) return { success: false, error: error.message };
+    return { success: true, data: data?.[0] || data };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
+  }
 }
 
 export async function updateMenuItem(id: number, item: Record<string, unknown>) {
@@ -39,9 +43,9 @@ export async function getOrders() {
 }
 
 export async function createOrder(order: Record<string, unknown>) {
-  const { data, error } = await supabase.from('orders').insert({ id: crypto.randomUUID(), ...order }).select().single();
+  const { data, error } = await supabase.from('orders').insert({ id: crypto.randomUUID(), ...order }).select();
   if (error) throw new Error(error.message);
-  return data;
+  return data?.[0];
 }
 
 export async function updateOrderStatus(id: string, status: string) {

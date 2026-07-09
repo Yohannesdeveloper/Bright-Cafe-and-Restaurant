@@ -24,12 +24,12 @@ export default function AdminMenuPage() {
     });
   }, []);
   const handleAdd = async (item: any) => {
-    try {
-      const data = await addMenuItem({ ...item, rating: 0 });
-      setItems(prev => [...prev, { ...data, available: true }]);
-    } catch (e) {
-      alert('Failed to add item: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    const res = await addMenuItem({ ...item, rating: 0 });
+    if (!res.success) {
+      alert('Failed to add item: ' + res.error);
+      return;
     }
+    setItems(prev => [...prev, { ...res.data, available: true }]);
   };
   const handleEdit = async (id: number, item: any) => {
     try {
