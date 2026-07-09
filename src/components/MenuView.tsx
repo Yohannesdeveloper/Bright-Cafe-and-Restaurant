@@ -274,7 +274,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
               <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Scan to Order</h3>
               <div className="inline-flex items-center justify-center w-28 h-28 rounded-2xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 p-2">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}/menu/1`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://bright-cafe-and-restaurant.vercel.app/`}
                   alt="QR Code"
                   className="w-full h-full"
                 />
