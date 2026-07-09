@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingBag, CheckCircle, ChefHat, Clock, XCircle, ArrowRight } from 'lucide-react';
-import { getOrders, updateOrderStatus } from '@/lib/actions';
+import { getOrders, updateOrderStatus, deleteCompletedOrders } from '@/lib/actions';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
@@ -60,7 +60,17 @@ export default function WaiterOrdersPage() {
           <h1 className="text-xl font-bold text-white">Orders</h1>
           <p className="text-xs text-white/40">{activeCount} active</p>
         </div>
-        <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium">LIVE</span>
+        <div className="flex items-center gap-2">
+          <button onClick={async () => {
+            if (confirm('Clear all served and cancelled orders?')) {
+              await deleteCompletedOrders();
+            }
+          }}
+            className="px-3 py-1.5 rounded-lg border border-white/[0.08] text-white/40 hover:text-red-400 hover:border-red-500/30 text-xs font-medium transition-all">
+            Clear History
+          </button>
+          <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium">LIVE</span>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-6">

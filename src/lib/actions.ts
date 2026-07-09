@@ -50,6 +50,11 @@ export async function updateOrderStatus(id: string, status: string) {
   return data;
 }
 
+export async function deleteCompletedOrders() {
+  const { error } = await supabase.from('orders').delete().in('status', ['served', 'cancelled']);
+  if (error) throw new Error(error.message);
+}
+
 // Inventory
 export async function getInventory() {
   const { data, error } = await supabase.from('inventory').select('*').order('id');
