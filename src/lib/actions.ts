@@ -39,7 +39,7 @@ export async function getOrders() {
 }
 
 export async function createOrder(order: Record<string, unknown>) {
-  const { data, error } = await supabase.from('orders').insert(order).select().single();
+  const { data, error } = await supabase.from('orders').insert({ id: crypto.randomUUID(), ...order }).select().single();
   if (error) throw new Error(error.message);
   return data;
 }
