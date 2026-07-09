@@ -24,7 +24,8 @@ export default function AdminMenuPage() {
     });
   }, []);
   const handleAdd = async (item: any) => {
-    const res = await addMenuItem({ ...item, rating: 0 });
+    const newId = Date.now();
+    const res = await addMenuItem({ id: newId, ...item, rating: 0 });
     if (!res.success) {
       alert('Failed to add item: ' + res.error);
       return;
