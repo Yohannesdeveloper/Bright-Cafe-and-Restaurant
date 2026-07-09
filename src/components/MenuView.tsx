@@ -4,7 +4,7 @@ import { FoodModal } from '@/components/FoodModal';
 import { Cart } from '@/components/Cart';
 import { ShoppingBag, Plus, Globe, Camera, MessageCircle, Play } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getMenuItems, getRestaurantSettings } from '@/lib/actions';
+import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
 import { ThemeToggle } from './ThemeToggle';
 import { FALLBACK_MENU } from '@/lib/menu-data';
 
@@ -83,9 +83,30 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
-  const handleCheckout = () => {
-    alert(`Proceeding to checkout${tableNumber ? ` for Table ${tableNumber}` : ''}...`);
-    setIsCartOpen(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+
+  const handleCheckout = async () => {
+    if (checkingOut) return;
+    setCheckingOut(true);
+    try {
+      await createOrder({
+        customer: `Table ${tableNumber || 'Takeaway'}`,
+        table_number: tableNumber || '0',
+        items: cartItems.map(item => ({
+          id: item.id, name: item.name, price: item.price, quantity: item.quantity, customizations: item.customizations,
+        })),
+        total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        status: 'confirmed',
+        notes: '',
+      });
+      setCartItems([]);
+      setIsCartOpen(false);
+      alert('Order placed successfully!');
+    } catch (e) {
+      alert('Failed to place order: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    } finally {
+      setCheckingOut(false);
+    }
   };
 
   const scrollToCategory = (category: string) => {
