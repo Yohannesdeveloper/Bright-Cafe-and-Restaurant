@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { checkWaiterAuth, logoutWaiter } from '@/lib/waiter-auth';
-import { LogOut, ShoppingBag, User } from 'lucide-react';
+import { LogOut, ShoppingBag, User, LayoutDashboard } from 'lucide-react';
 
 export default function WaiterLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -39,6 +39,10 @@ export default function WaiterLayout({ children }: { children: React.ReactNode }
             <span className="text-sm font-medium text-white/80">{waiter?.name || 'Waiter'}</span>
           </div>
           <div className="flex items-center gap-2">
+            <button onClick={() => router.push('/waiter/dashboard')}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all flex items-center gap-1.5">
+              <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+            </button>
             <button onClick={() => router.push('/waiter/orders')}
               className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all flex items-center gap-1.5">
               <ShoppingBag className="w-3.5 h-3.5" /> Orders
