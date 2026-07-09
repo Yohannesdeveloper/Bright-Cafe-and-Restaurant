@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, CheckCircle, ChefHat, Clock, XCircle, ArrowRight, RefreshCw } from 'lucide-react';
+import { ShoppingBag, CheckCircle, ChefHat, Clock, XCircle, ArrowRight } from 'lucide-react';
 import { getOrders, updateOrderStatus } from '@/lib/actions';
+import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; dot: string; next?: string; nextLabel?: string }> = {
@@ -28,11 +29,16 @@ export default function WaiterOrdersPage() {
     }
   }, []);
 
-  useEffect(() => { fetchOrders(); }, [fetchOrders]);
+  useEffect(() => {
+    fetchOrders();
+    const channel = supabase.channel('waiter-orders')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchOrders]);
 
   const handleStatus = async (id: string, status: string) => {
     await updateOrderStatus(id, status);
-    fetchOrders();
   };
 
   const filtered = orders.filter(o => activeTab === 'all' || (o.status !== 'served' && o.status !== 'cancelled'));
@@ -53,10 +59,7 @@ export default function WaiterOrdersPage() {
           <h1 className="text-xl font-bold text-white">Orders</h1>
           <p className="text-xs text-white/40">{activeCount} active</p>
         </div>
-        <button onClick={fetchOrders}
-          className="p-2 rounded-lg border border-white/[0.08] text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37]/30 transition-all">
-          <RefreshCw className="w-4 h-4" />
-        </button>
+        <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium">LIVE</span>
       </div>
 
       <div className="flex gap-2 mb-6">

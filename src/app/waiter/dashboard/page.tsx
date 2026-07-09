@@ -3,8 +3,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Clock, CheckCircle, ChefHat, TrendingUp, ArrowRight, RefreshCw } from 'lucide-react';
+import { ShoppingBag, Clock, CheckCircle, ChefHat, TrendingUp, ArrowRight } from 'lucide-react';
 import { getOrders } from '@/lib/actions';
+import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
@@ -29,7 +30,13 @@ export default function WaiterDashboard() {
     }
   }, []);
 
-  useEffect(() => { fetchOrders(); }, [fetchOrders]);
+  useEffect(() => {
+    fetchOrders();
+    const channel = supabase.channel('waiter-dashboard')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchOrders]);
 
   const activeOrders = orders.filter(o => o.status !== 'served' && o.status !== 'cancelled');
   const todayOrders = orders.filter(o => {
@@ -65,10 +72,7 @@ export default function WaiterDashboard() {
           <h1 className="text-xl font-bold text-white">Dashboard</h1>
           <p className="text-xs text-white/40">{todayOrders.length} orders today</p>
         </div>
-        <button onClick={fetchOrders}
-          className="p-2 rounded-lg border border-white/[0.08] text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37]/30 transition-all">
-          <RefreshCw className="w-4 h-4" />
-        </button>
+        <span className="px-2 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium">LIVE</span>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
