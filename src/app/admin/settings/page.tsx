@@ -28,6 +28,7 @@ export default function AdminSettingsPage() {
       telegram: data.telegram || '',
       tiktok: data.tiktok || '',
       youtube: data.youtube || '',
+      facebook: data.facebook || '',
     };
     await saveRestaurantSettings(payload);
     alert('Settings saved!');
@@ -46,6 +47,7 @@ export default function AdminSettingsPage() {
     telegram: settings.telegram || '',
     tiktok: settings.tiktok || '',
     youtube: settings.youtube || '',
+    facebook: settings.facebook || '',
   } : null;
 
   if (authorized === null || !defaultSettings) {

@@ -297,18 +297,36 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
             {/* Social Media */}
             <div className="text-center md:text-left">
               <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Follow Us</h3>
-              <div className="flex items-center justify-center md:justify-start gap-4">
-                <a href={settings?.website || '#'} target="_blank" rel="noopener noreferrer" title="Website" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
-                  <Globe className="h-5 w-5" />
+              <div className="grid grid-cols-5 gap-4">
+                <a href={settings?.website || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
+                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
+                    <Globe className="h-5 w-5" />
+                  </div>
+                  <span className="text-[10px] font-medium">Website</span>
                 </a>
-                <a href={(settings as any)?.instagram || '#'} target="_blank" rel="noopener noreferrer" title="Instagram" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
-                  <Camera className="h-5 w-5" />
+                <a href={(settings as any)?.instagram || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
+                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
+                    <Camera className="h-5 w-5" />
+                  </div>
+                  <span className="text-[10px] font-medium">Instagram</span>
                 </a>
-                <a href={(settings as any)?.telegram || '#'} target="_blank" rel="noopener noreferrer" title="Telegram" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
-                  <MessageCircle className="h-5 w-5" />
+                <a href={(settings as any)?.telegram || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
+                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
+                    <MessageCircle className="h-5 w-5" />
+                  </div>
+                  <span className="text-[10px] font-medium">Telegram</span>
                 </a>
-                <a href={(settings as any)?.tiktok || '#'} target="_blank" rel="noopener noreferrer" title="TikTok" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
-                  <Play className="h-5 w-5" />
+                <a href={(settings as any)?.facebook || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
+                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  </div>
+                  <span className="text-[10px] font-medium">Facebook</span>
+                </a>
+                <a href={(settings as any)?.tiktok || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
+                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
+                    <Play className="h-5 w-5" />
+                  </div>
+                  <span className="text-[10px] font-medium">TikTok</span>
                 </a>
               </div>
             </div>
