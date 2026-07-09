@@ -3,8 +3,9 @@
 import { FoodModal } from '@/components/FoodModal';
 import { Cart } from '@/components/Cart';
 import { ShoppingBag, Plus, Globe, Camera, MessageCircle, Play, Phone, MapPin } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
+import { supabase } from '@/lib/supabase';
 import { ThemeToggle } from './ThemeToggle';
 import { FALLBACK_MENU } from '@/lib/menu-data';
 
@@ -26,8 +27,9 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   const [settings, setSettings] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState<string>('');
 
-  useEffect(() => {
-    getMenuItems().then((data) => {
+  const fetchAndMergeMenu = useCallback(async () => {
+    try {
+      const data = await getMenuItems();
       if (data.length > 0) {
         const fallbackIds = new Set(FALLBACK_MENU.map(item => item.id));
         const merged = FALLBACK_MENU.map(fbItem => {
@@ -39,7 +41,19 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
         });
         setMenuItems(merged);
       }
-    }).catch(() => {});
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    fetchAndMergeMenu();
+    const channel = supabase.channel('menu-items')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, fetchAndMergeMenu)
+      .subscribe();
+    const interval = setInterval(fetchAndMergeMenu, 5000);
+    return () => { supabase.removeChannel(channel); clearInterval(interval); };
+  }, [fetchAndMergeMenu]);
+
+  useEffect(() => {
     getRestaurantSettings().then(setSettings).catch(() => {});
   }, []);
 

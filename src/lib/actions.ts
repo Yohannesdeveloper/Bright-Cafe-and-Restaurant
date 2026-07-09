@@ -10,9 +10,9 @@ export async function getMenuItems() {
 }
 
 export async function addMenuItem(item: Record<string, unknown>) {
-  const { data, error } = await supabase.from('menu_items').insert(item).select().single();
-  if (error) throw new Error(error.message);
-  return data;
+  const { data, error } = await supabase.from('menu_items').insert(item).select();
+  if (error) throw new Error(JSON.stringify({ message: error.message, code: error.code, details: error.details }));
+  return data?.[0] || data;
 }
 
 export async function updateMenuItem(id: number, item: Record<string, unknown>) {
