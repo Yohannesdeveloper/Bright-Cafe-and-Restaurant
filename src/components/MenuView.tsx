@@ -2,7 +2,7 @@
 
 import { FoodModal } from '@/components/FoodModal';
 import { Cart } from '@/components/Cart';
-import { ShoppingBag, Plus, Globe, Camera, MessageCircle, Play } from 'lucide-react';
+import { ShoppingBag, Plus, Globe, Camera, MessageCircle, Play, Phone, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
 import { ThemeToggle } from './ThemeToggle';
@@ -266,25 +266,61 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
       </section>
 
       {/* Footer */}
-      <div className="border-t border-black/10 dark:border-white/10 px-4 py-8 text-center">
-        <div className="mx-auto mb-4 flex items-center justify-center space-x-5">
-          <a href="#" target="_blank" rel="noopener noreferrer" className="text-black/60 hover:text-[#D4AF37] dark:text-white/60 dark:hover:text-[#D4AF37] transition-colors">
-            <Camera className="h-5 w-5" />
-          </a>
-          <a href="#" target="_blank" rel="noopener noreferrer" className="text-black/60 hover:text-[#D4AF37] dark:text-white/60 dark:hover:text-[#D4AF37] transition-colors">
-            <Globe className="h-5 w-5" />
-          </a>
-          <a href="#" target="_blank" rel="noopener noreferrer" className="text-black/60 hover:text-[#D4AF37] dark:text-white/60 dark:hover:text-[#D4AF37] transition-colors">
-            <MessageCircle className="h-5 w-5" />
-          </a>
-          <a href="#" target="_blank" rel="noopener noreferrer" className="text-black/60 hover:text-[#D4AF37] dark:text-white/60 dark:hover:text-[#D4AF37] transition-colors">
-            <Play className="h-5 w-5" />
-          </a>
+      <footer className="border-t border-black/10 dark:border-white/10">
+        <div className="mx-auto max-w-4xl px-4 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* QR Code */}
+            <div className="text-center md:text-left">
+              <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Scan to Order</h3>
+              <div className="inline-flex items-center justify-center w-28 h-28 rounded-2xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 p-2">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}/menu/1`}
+                  alt="QR Code"
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div className="text-center md:text-left">
+              <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Contact Us</h3>
+              <div className="space-y-2 text-sm text-black/60 dark:text-white/60">
+                <a href={`tel:${settings?.phone || '+251-XXX-XXXXXX'}`} className="flex items-center justify-center md:justify-start gap-2 hover:text-[#D4AF37] transition-colors">
+                  <Phone className="h-4 w-4" /> {settings?.phone || '+251-XXX-XXXXXX'}
+                </a>
+                <a href={`https://maps.google.com/?q=${encodeURIComponent(settings?.address || 'Bright cafe & restaurant')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center md:justify-start gap-2 hover:text-[#D4AF37] transition-colors">
+                  <MapPin className="h-4 w-4" /> {settings?.address || 'Bright cafe & restaurant'}
+                </a>
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div className="text-center md:text-left">
+              <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Follow Us</h3>
+              <div className="flex items-center justify-center md:justify-start gap-4">
+                <a href={settings?.website || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                  <Globe className="h-5 w-5" />
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                  <Camera className="h-5 w-5" />
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                  <MessageCircle className="h-5 w-5" />
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center text-black/60 dark:text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 transition-all">
+                  <Play className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-black/10 dark:border-white/10 text-center">
+            <p className="text-xs text-black/60 dark:text-white/60">
+              No service charge applies. Kindly note that prices are subject to 15% VAT.
+            </p>
+          </div>
         </div>
-        <p className="text-xs text-black/60 dark:text-white/60">
-          No service charge applies. Kindly note that prices are subject to 15% VAT.
-        </p>
-      </div>
+      </footer>
 
       {/* Food Modal */}
       {selectedItem && (
