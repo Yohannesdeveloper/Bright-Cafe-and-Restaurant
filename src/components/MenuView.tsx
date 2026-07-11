@@ -225,7 +225,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
                       className="h-full w-full overflow-hidden rounded-xl border border-black/10 dark:border-white/10 cursor-zoom-in"
                     >
                       <div className="h-full w-full">
-                        {item.image?.match(/^(http|data):/) ? (
+                        {item.image?.match(/^(https?|data):/) ? (
                           <img
                             src={item.image}
                             alt={item.name}
