@@ -118,7 +118,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
               >
                 {/* Image */}
                 <div className="relative h-40 overflow-hidden">
-                  {item.image?.startsWith('http') ? (
+                  {item.image?.match(/^(http|data):/) ? (
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
@@ -191,7 +191,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
               >
                 <div className="col-span-4 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/[0.04] shrink-0">
-                    {item.image?.startsWith('http') ? (
+                    {item.image?.match(/^(http|data):/) ? (
                       <img src={item.image} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -320,7 +320,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Image URL <span className="font-normal normal-case text-white/20">or upload</span></label>
-                    <input type="url" name="image" defaultValue={editingItem?.image?.startsWith('http') ? editingItem.image : ''}
+                    <input type="url" name="image" defaultValue={editingItem?.image?.match(/^(http|data):/) ? editingItem.image : ''}
                       className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
                       placeholder="https://images.unsplash.com/photo-..." />
                   </div>

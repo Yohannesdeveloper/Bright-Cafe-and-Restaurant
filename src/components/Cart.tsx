@@ -85,7 +85,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, o
                         >
                           <div className="flex items-start space-x-4">
                             <div className="w-16 h-16 bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 rounded-lg flex items-center justify-center overflow-hidden">
-                              {item.image?.startsWith('http') ? (
+                              {item.image?.match(/^(http|data):/) ? (
                                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                               ) : (
                                 <span className="text-3xl">{item.image}</span>

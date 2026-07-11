@@ -79,7 +79,7 @@ export function FoodModal({ item, isOpen, onClose, onAddToCart }: FoodModalProps
                 </motion.button>
 
                 <div className="relative">
-                  {item.image?.startsWith('http') ? (
+                  {item.image?.match(/^(http|data):/) ? (
                     <img src={item.image} alt={item.name} className="w-full h-64 object-cover" />
                   ) : (
                     <div className="flex w-full h-64 items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-6xl">
