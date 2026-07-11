@@ -20,14 +20,18 @@ export async function addMenuItem(item: Record<string, unknown>) {
 }
 
 export async function updateMenuItem(id: number, item: Record<string, unknown>) {
-  const { data, error } = await supabase.from('menu_items').update(item).eq('id', id).select();
-  if (error) throw new Error(error.message);
-  if (!data || data.length === 0) {
-    const { data: inserted, error: insertError } = await supabase.from('menu_items').insert({ id, ...item }).select().single();
-    if (insertError) throw new Error(insertError.message);
-    return inserted;
+  try {
+    const { data, error } = await supabase.from('menu_items').update(item).eq('id', id).select();
+    if (error) return { success: false, error: error.message };
+    if (!data || data.length === 0) {
+      const { data: inserted, error: insertError } = await supabase.from('menu_items').insert({ id, ...item }).select();
+      if (insertError) return { success: false, error: insertError.message };
+      return { success: true, data: inserted?.[0] || inserted };
+    }
+    return { success: true, data: data[0] };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
   }
-  return data[0];
 }
 
 export async function deleteMenuItem(id: number) {

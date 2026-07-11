@@ -280,7 +280,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                   const url = data.get('image') as string;
                   const available = data.get('available') === 'on';
                   const image = url || uploadedImage;
-                  if (!image) return;
+                  if (!image) { alert('Please provide an image URL or upload one.'); return; }
                   if (editingItem) {
                     onEdit(editingItem.id, { name, description, price, category, image, available });
                   } else {

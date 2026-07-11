@@ -33,12 +33,12 @@ export default function AdminMenuPage() {
     setItems(prev => [...prev, { ...res.data, available: true }]);
   };
   const handleEdit = async (id: number, item: any) => {
-    try {
-      await updateMenuItem(id, item);
-      setItems(prev => prev.map(i => i.id === id ? { ...i, ...item } : i));
-    } catch (e) {
-      alert('Failed to update item: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    const res = await updateMenuItem(id, item);
+    if (!res.success) {
+      alert('Failed to update item: ' + res.error);
+      return;
     }
+    setItems(prev => prev.map(i => i.id === id ? { ...i, ...item } : i));
   };
   const handleDelete = async (id: number) => {
     try {
