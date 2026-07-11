@@ -320,7 +320,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Image URL <span className="font-normal normal-case text-white/20">or upload</span></label>
-                    <input type="url" name="image" defaultValue={editingItem?.image?.match(/^(https?|data):/) ? editingItem.image : ''}
+                    <input type="text" name="image" inputMode="url" defaultValue={editingItem?.image?.match(/^(https?|data):/) ? editingItem.image : ''}
                       className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
                       placeholder="https://images.unsplash.com/photo-..." />
                   </div>
