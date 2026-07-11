@@ -3,7 +3,7 @@
 import { MenuManagement } from '@/components/MenuManagement';
 import { useEffect, useState } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
-import { getMenuItems, addMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/actions';
+import { getMenuItems, addMenuItem, updateMenuItem, deleteMenuItem, seedMenuItems } from '@/lib/actions';
 import { FALLBACK_MENU } from '@/lib/menu-data';
 
 export default function AdminMenuPage() {
@@ -17,7 +17,10 @@ export default function AdminMenuPage() {
       try {
         const data = await getMenuItems();
         if (data.length > 0) setItems(data);
-        else setItems(FALLBACK_MENU.map(item => ({ ...item, available: true })));
+        else {
+          const seeded = await seedMenuItems(FALLBACK_MENU.map(item => ({ ...item, available: true })));
+          setItems(seeded.success ? seeded.data! : FALLBACK_MENU.map(item => ({ ...item, available: true })));
+        }
       } catch {
         setItems(FALLBACK_MENU.map(item => ({ ...item, available: true })));
       }

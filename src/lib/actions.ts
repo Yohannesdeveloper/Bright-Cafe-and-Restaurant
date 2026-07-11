@@ -9,6 +9,12 @@ export async function getMenuItems() {
   return data || [];
 }
 
+export async function seedMenuItems(items: Record<string, unknown>[]) {
+  const { data, error } = await supabase.from('menu_items').upsert(items, { onConflict: 'id' }).select();
+  if (error) return { success: false, error: error.message };
+  return { success: true, data };
+}
+
 export async function addMenuItem(item: Record<string, unknown>) {
   try {
     const { data, error } = await supabase.from('menu_items').insert(item).select();
