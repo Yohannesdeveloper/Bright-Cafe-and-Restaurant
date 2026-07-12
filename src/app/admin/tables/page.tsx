@@ -11,7 +11,7 @@ const seedTables = async () => {
     const capacity = i <= 5 ? 2 : i <= 10 ? 4 : 6;
     const location = locations[i % locations.length];
     const qrCode = typeof window !== 'undefined' ? `${window.location.origin}/menu/${i}` : '';
-    await addRestaurantTable({ number: i, capacity, location, qr_code: qrCode, status: 'available' });
+    await addRestaurantTable({ number: i.toString(), capacity, location, qr_code: qrCode, status: 'available' });
   }
 };
 
@@ -47,12 +47,16 @@ export default function AdminTablesPage() {
     checkAdminAuth().then(async (authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      const existing = await getRestaurantTables();
-      if (existing.length === 0) {
-        await seedTables();
-        await loadTables();
-      } else {
-        setTables(existing);
+      try {
+        const existing = await getRestaurantTables();
+        if (existing.length === 0) {
+          await seedTables();
+          await loadTables();
+        } else {
+          setTables(existing);
+        }
+      } catch (e: any) {
+        setSeedError(e.message);
       }
     });
   }, []);

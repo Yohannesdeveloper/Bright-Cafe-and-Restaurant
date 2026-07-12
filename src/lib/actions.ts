@@ -101,15 +101,15 @@ export async function getRestaurantTables() {
 }
 
 export async function addRestaurantTable(table: Record<string, unknown>) {
-  const { data, error } = await supabase.from('restaurant_tables').insert(table).select().single();
+  const { data, error } = await supabase.from('restaurant_tables').insert(table).select();
   if (error) throw new Error(error.message);
-  return data;
+  return data?.[0] || data;
 }
 
 export async function updateRestaurantTable(id: number, table: Record<string, unknown>) {
-  const { data, error } = await supabase.from('restaurant_tables').update(table).eq('id', id).select().single();
+  const { data, error } = await supabase.from('restaurant_tables').update(table).eq('id', id).select();
   if (error) throw new Error(error.message);
-  return data;
+  return data?.[0] || data;
 }
 
 export async function deleteRestaurantTable(id: number) {
