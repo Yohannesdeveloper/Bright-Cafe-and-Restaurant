@@ -1,61 +1,68 @@
 'use client';
 
 import { MenuManagement } from '@/components/MenuManagement';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
 import { getMenuItems, addMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/actions';
 import { getCached, setCache } from '@/lib/cache';
+import { FALLBACK_MENU } from '@/lib/menu-data';
+import { RefreshCw } from 'lucide-react';
+
+const FALLBACK = FALLBACK_MENU.map(item => ({ ...item, available: true }));
 
 export default function AdminMenuPage() {
-  const [items, setItems] = useState<any[] | null>(null);
+  const [items, setItems] = useState<any[]>(() => getCached<any[]>('adminMenuItems') || FALLBACK);
   const [authorized, setAuthorized] = useState<boolean | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const mounted = useRef(false);
 
   useEffect(() => {
-    checkAdminAuth().then(async (authed) => {
+    checkAdminAuth().then((authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      const cached = getCached<any[]>('adminMenuItems');
-      if (cached) setItems(cached);
-      try {
-        const data = await getMenuItems();
-        if (data.length > 0) { setItems(data); setCache('adminMenuItems', data); }
-      } catch { /* ignore */ }
     });
   }, []);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      const data = await getMenuItems();
+      if (data.length > 0) { setItems(data); setCache('adminMenuItems', data); }
+    } catch { /* ignore */ }
+    finally { setRefreshing(false); }
+  };
 
   const handleAdd = async (item: any) => {
     const res = await addMenuItem(item);
     if (!res.success) { alert('Failed: ' + res.error); return; }
-    setItems(prev => [...(prev ?? []), { ...res.data, available: true }]);
+    const next = [...items, { ...res.data, available: true }];
+    setItems(next);
+    setCache('adminMenuItems', next);
   };
 
   const handleEdit = async (id: number, item: any) => {
     const res = await updateMenuItem(id, item);
     if (!res.success) { alert('Failed: ' + res.error); return; }
-    setItems(prev => (prev ?? []).map(i => i.id === id ? { ...i, ...item } : i));
+    const next = items.map(i => i.id === id ? { ...i, ...item } : i);
+    setItems(next);
+    setCache('adminMenuItems', next);
   };
 
   const handleDelete = async (id: number) => {
-    try { await deleteMenuItem(id); setItems(prev => (prev ?? []).filter(i => i.id !== id)); }
-    catch (e) { alert('Failed: ' + (e instanceof Error ? e.message : 'Unknown error')); }
+    try {
+      await deleteMenuItem(id);
+      const next = items.filter(i => i.id !== id);
+      setItems(next);
+      setCache('adminMenuItems', next);
+    } catch (e) {
+      alert('Failed: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    }
   };
 
-  if (items === null) {
+  if (authorized === null) {
     return (
-      <div className="p-4 sm:p-6 lg:p-8 animate-pulse">
-        <div className="flex items-center justify-between mb-6">
-          <div className="h-8 w-40 bg-white/[0.04] rounded-lg" />
-          <div className="h-10 w-32 bg-white/[0.04] rounded-xl" />
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="h-10 flex-1 bg-white/[0.04] rounded-xl" />
-          <div className="h-10 w-40 bg-white/[0.04] rounded-xl" />
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="rounded-2xl overflow-hidden aspect-[3/4] bg-white/[0.03]" />
-          ))}
-        </div>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <MenuManagement items={items} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} />
       </div>
     );
   }
@@ -63,6 +70,13 @@ export default function AdminMenuPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex items-center justify-end mb-4">
+        <button onClick={refresh} disabled={refreshing}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs hover:text-[#D4AF37] hover:border-[#D4AF37]/30 transition-all disabled:opacity-50">
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Refreshing...' : 'Sync from DB'}
+        </button>
+      </div>
       <MenuManagement items={items} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );
