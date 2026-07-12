@@ -11,6 +11,8 @@ import { getCached, setCache } from '@/lib/cache';
 import { supabase } from '@/lib/supabase';
 import { ThemeToggle } from './ThemeToggle';
 import { QRCodeSVG } from 'qrcode.react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface CartItem {
   id: number;
@@ -27,10 +29,11 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [menuItems, setMenuItems] = useState<any[] | null>(() => initialItems && initialItems.length > 0 ? initialItems : getCached<any[]>('menuItems'));
+  const [menuItems, setMenuItems] = useState<any[] | null>(null);
   const [settings, setSettings] = useState<any>(null);
-  const [activeCategory, setActiveCategory] = useState<string>(searchParams.get('category') || '');
+  const [activeCategory, setActiveCategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
 
   const refreshMenu = useCallback(async () => {
     try {
@@ -53,6 +56,19 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
   }, []);
 
   useEffect(() => {
+    setMounted(true);
+    // Initialize from cache or initial items after mount
+    if (initialItems && initialItems.length > 0) {
+      setMenuItems(initialItems);
+    } else {
+      const cached = getCached<any[]>('menuItems');
+      if (cached) setMenuItems(cached);
+    }
+    // Set active category from URL
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) setActiveCategory(categoryFromUrl);
+    // Refresh menu
+    refreshMenu();
     const channel = supabase.channel('menu-items')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, refreshMenu)
       .subscribe();
@@ -148,6 +164,25 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
   };
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-white dark:from-[#050508] dark:to-[#0a0a12] text-black dark:text-white">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 py-8 px-4 max-w-7xl mx-auto">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="animate-pulse rounded-2xl bg-white/5 border border-white/[0.06] p-1.5 sm:p-2 flex gap-2">
+              <div className="w-[8rem] h-[8rem] rounded-xl bg-white/[0.06] shrink-0" />
+              <div className="flex-1 p-2 space-y-2">
+                <div className="h-4 w-3/4 rounded bg-white/[0.06]" />
+                <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
+                <div className="h-5 w-1/3 rounded bg-white/[0.06] mt-auto" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-white dark:from-[#050508] dark:to-[#0a0a12] text-black dark:text-white">
@@ -292,11 +327,14 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
                       >
                         <div className="h-full w-full">
                           {item.image?.match(/^(https?|data):/) ? (
-                            <img
+                            <LazyLoadImage
                               src={item.image}
                               alt={item.name}
                               className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
-                              loading="lazy"
+                              effect="blur"
+                              threshold={100}
+                              wrapperClassName="h-full w-full"
+                              decoding="async"
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-4xl">

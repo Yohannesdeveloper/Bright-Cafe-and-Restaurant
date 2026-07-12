@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { getRestaurantSettings, getMenuItems } from '@/lib/actions';
 import { getCached, setCache } from '@/lib/cache';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const IMG = {
   food1: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80',
@@ -212,7 +214,14 @@ export default function LandingPage() {
                 whileHover={{ y: -8 }} className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
               >
                 <Link href="/menu">
-                  <img src={item.image} alt={item.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async" />
+                  <LazyLoadImage
+                    src={item.image}
+                    alt={item.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    effect="blur"
+                    threshold={100}
+                    decoding="async"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-[#050508]/30 to-transparent" />
                   <div className="absolute top-3 left-3">
                     <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white/80">{item.category}</span>
@@ -398,7 +407,14 @@ export default function LandingPage() {
                 className={`relative overflow-hidden rounded-2xl ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
               >
                 <div className={`${i === 0 ? 'aspect-[4/5] md:aspect-auto md:h-full' : 'aspect-[4/3]'}`}>
-                  <img src={img} alt="Restaurant" className="w-full h-full object-cover hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async" />
+                  <LazyLoadImage
+                    src={img}
+                    alt="Restaurant"
+                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                    effect="blur"
+                    threshold={100}
+                    decoding="async"
+                  />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               </motion.div>

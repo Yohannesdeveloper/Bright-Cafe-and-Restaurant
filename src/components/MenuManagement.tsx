@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, Search, Image as ImageIcon, Upload, X, Sparkles, ChevronDown, Grid3X3, List, Package } from 'lucide-react';
 import { useState, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { uploadImageToStorage } from '@/lib/supabase';
 
 interface FoodItem {
   id: number; name: string; description: string; price: number;
@@ -26,11 +27,60 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Resize image before upload
     const reader = new FileReader();
-    reader.onload = (ev) => setUploadedImage(ev.target?.result as string);
+    reader.onload = async (ev) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Calculate new dimensions (max 800px width/height)
+        const maxSize = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to WebP for better compression
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            // Upload to Supabase Storage
+            const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.webp'), { type: 'image/webp' });
+            const uploadedUrl = await uploadImageToStorage(webpFile, file.name);
+            
+            if (uploadedUrl) {
+              setUploadedImage(uploadedUrl);
+            } else {
+              // Fallback to data URL if upload fails
+              const reader = new FileReader();
+              reader.onload = (ev) => setUploadedImage(ev.target?.result as string);
+              reader.readAsDataURL(blob);
+            }
+          }
+        }, 'image/webp', 0.85);
+      };
+      img.src = ev.target?.result as string;
+    };
     reader.readAsDataURL(file);
   };
 
@@ -119,7 +169,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                 {/* Image */}
                 <div className="relative h-40 overflow-hidden">
                   {item.image?.match(/^(https?|data):/) ? (
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" />
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" fetchPriority="low" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
                       <ImageIcon className="w-10 h-10 text-amber-500/20" />
