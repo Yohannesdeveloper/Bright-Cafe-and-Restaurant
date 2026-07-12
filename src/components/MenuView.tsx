@@ -52,7 +52,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
     if (cached && cached.length > 0) {
       setMenuItems(cached);
       // refresh in background without blocking render
-      setTimeout(refreshMenu, 2000);
+      refreshMenu();
     } else {
       refreshMenu();
     }

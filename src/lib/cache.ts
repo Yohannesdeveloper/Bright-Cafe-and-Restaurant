@@ -1,4 +1,4 @@
-const CACHE_DURATION = 300_000;
+const CACHE_DURATION = 86_400_000; // 24 hours
 
 interface CacheEntry<T> {
   data: T;

@@ -1,28 +1,31 @@
 import { NextResponse } from 'next/server';
-import { getCache, setCache } from '@/lib/redis';
 import { supabase } from '@/lib/supabase';
 
 export const runtime = 'nodejs';
 
+let memCache: { data: any[]; ts: number } | null = null;
+const MEM_TTL = 60_000; // 60s in-memory cache
+
 export async function GET() {
-  const cached = await getCache<any[]>('menuItems');
-  if (cached) {
-    return NextResponse.json(cached, {
-      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+  // 1. In-memory cache — zero latency
+  if (memCache && Date.now() - memCache.ts < MEM_TTL) {
+    return NextResponse.json(memCache.data, {
+      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
     });
   }
 
+  // 2. Supabase fetch
   const { data, error } = await supabase
     .from('menu_items')
     .select('id,name,description,price,category,image,available,rating,created_at')
     .order('id');
 
-  if (error) return NextResponse.json([], { status: 500 });
+  if (error) return NextResponse.json(memCache?.data ?? [], { status: error ? 200 : 500 });
 
   const items = data || [];
-  await setCache('menuItems', items, 3600);
+  memCache = { data: items, ts: Date.now() };
 
   return NextResponse.json(items, {
-    headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
   });
 }

@@ -33,6 +33,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://plus.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://stnwzgzndyzkesztwxkd.supabase.co" />
+        <link rel="dns-prefetch" href="https://stnwzgzndyzkesztwxkd.supabase.co" />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <ThemeProvider

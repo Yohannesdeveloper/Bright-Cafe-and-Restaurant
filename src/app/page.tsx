@@ -63,6 +63,11 @@ export default function LandingPage() {
   const heroOpacity = 1;
 
   useEffect(() => {
+    // Prefetch menu data so it's cached before user clicks
+    fetch('/api/menu').then(r => r.json()).then(data => {
+      if (data?.length > 0) setCache('menuItems', data);
+    }).catch(() => {});
+
     const cachedSettings = getCached<any>('settings');
     if (cachedSettings) setSettings(cachedSettings);
     else getRestaurantSettings().then(d => { setSettings(d); setCache('settings', d); }).catch(() => {});
