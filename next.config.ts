@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'i.pinimg.com' },
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'https', hostname: '**' },
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,

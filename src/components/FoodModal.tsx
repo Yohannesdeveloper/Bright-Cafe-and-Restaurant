@@ -81,7 +81,9 @@ export function FoodModal({ item, isOpen, onClose, onAddToCart }: FoodModalProps
                 </motion.button>
 
                 <div className="relative">
-                  {item.image?.match(/^(https?|data):/) ? (
+                  {item.image?.match(/^data:/) ? (
+                    <img src={item.image} alt={item.name} className="w-full h-64 object-cover" />
+                  ) : item.image?.match(/^https?:/) ? (
                     <div className="relative w-full h-64">
                       <Image src={item.image} alt={item.name} fill className="object-cover" />
                     </div>

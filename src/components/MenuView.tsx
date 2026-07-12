@@ -308,7 +308,13 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
                         className="h-full w-full cursor-zoom-in"
                       >
                         <div className="h-full w-full relative">
-                          {item.image?.match(/^(https?|data):/) ? (
+                          {item.image?.match(/^data:/) ? (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                            />
+                          ) : item.image?.match(/^https?:/) ? (
                             <Image
                               src={item.image}
                               alt={item.name}
