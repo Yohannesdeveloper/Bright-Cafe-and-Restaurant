@@ -171,7 +171,7 @@ export default function LandingPage() {
             <span className="text-3xl sm:text-4xl lg:text-5xl text-white/60 font-light">&amp; Restaurant</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.3 }} className="text-white/50 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            {settings?.description || 'Experience premium dining with our digital menu. Browse, order, and enjoy — all from your device.'}
+            {settings?.description || 'Make Your Day Bright'}
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.45 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/menu" className="group relative px-10 py-4 bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-black font-bold text-lg rounded-full shadow-2xl shadow-[#D4AF37]/25 hover:shadow-[#D4AF37]/50 transition-all duration-500 hover:scale-105 active:scale-95">
@@ -445,7 +445,7 @@ export default function LandingPage() {
                 <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="w-9 h-9 object-contain" />
                 <span className="font-semibold">Bright Cafe &amp; Restaurant</span>
               </div>
-              <p className="text-white/40 text-sm max-w-md">Experience premium dining with our digital menu system. Fresh ingredients, authentic recipes, unforgettable taste.</p>
+              <p className="text-white/40 text-sm max-w-md">Make Your Day Bright</p>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white mb-4">Quick Links</h4>
