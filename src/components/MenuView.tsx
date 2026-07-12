@@ -28,7 +28,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [menuItems, setMenuItems] = useState<any[]>(() => initialItems && initialItems.length > 0 ? initialItems : getCached<any[]>('menuItems') || FALLBACK_MENU.map(i => ({ ...i, available: true })));
+  const [menuItems, setMenuItems] = useState<any[] | null>(() => initialItems && initialItems.length > 0 ? initialItems : getCached<any[]>('menuItems'));
   const [settings, setSettings] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState<string>(searchParams.get('category') || '');
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,7 +60,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
     return () => { supabase.removeChannel(channel); clearInterval(interval); };
   }, []);
 
-  const filteredItems = useMemo(() => menuItems.filter(item => {
+  const filteredItems = useMemo(() => (menuItems ?? []).filter(item => {
     const q = searchQuery.toLowerCase();
     return !q || item.name.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q);
   }), [menuItems, searchQuery]);
@@ -229,7 +229,21 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
 
         {/* Menu Sections */}
         <main className="mx-auto max-w-7xl px-4 pb-24 pt-2">
-          {filteredItems.length === 0 && (
+          {menuItems === null && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 py-8">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="animate-pulse rounded-2xl bg-white/5 border border-white/[0.06] p-1.5 sm:p-2 flex gap-2">
+                  <div className="w-[8rem] h-[8rem] rounded-xl bg-white/[0.06] shrink-0" />
+                  <div className="flex-1 p-2 space-y-2">
+                    <div className="h-4 w-3/4 rounded bg-white/[0.06]" />
+                    <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
+                    <div className="h-5 w-1/3 rounded bg-white/[0.06] mt-auto" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {menuItems !== null && filteredItems.length === 0 && (
             <div className="text-center py-20">
               <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
                 <Search className="w-6 h-6 text-white/30" />
