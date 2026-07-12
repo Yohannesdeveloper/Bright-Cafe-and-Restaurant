@@ -1,13 +1,21 @@
-import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
-
-const MenuView = dynamic(() => import('@/components/MenuView').then(m => ({ default: m.MenuView })));
+import { getMenuItems, getRestaurantSettings } from '@/lib/actions';
+import { MenuView } from '@/components/MenuView';
 
 export default async function TableMenu({ params }: { params: Promise<{ table: string }> }) {
   const { table } = await params;
+
+  // Fetch in parallel on the server
+  const [menuItems, settings] = await Promise.all([
+    getMenuItems().catch(() => []),
+    getRestaurantSettings().catch(() => null)
+  ]);
+
   return (
-    <Suspense fallback={null}>
-      <MenuView key={table} tableNumber={table} />
-    </Suspense>
+    <MenuView
+      key={table}
+      tableNumber={table}
+      initialMenuItems={menuItems}
+      initialSettings={settings}
+    />
   );
 }

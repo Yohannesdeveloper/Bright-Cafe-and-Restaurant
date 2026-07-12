@@ -23,15 +23,29 @@ interface CartItem {
   image: string;
 }
 
-export function MenuView({ tableNumber }: { tableNumber?: string }) {
+interface MenuViewProps {
+  tableNumber?: string;
+  initialMenuItems?: any[];
+  initialSettings?: any;
+  initialCategory?: string;
+}
+
+export function MenuView({
+  tableNumber,
+  initialMenuItems = [],
+  initialSettings = null,
+  initialCategory = ''
+}: MenuViewProps) {
   const searchParams = useSearchParams();
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [menuItems, setMenuItems] = useState<any[] | null>(null);
-  const [settings, setSettings] = useState<any>(null);
-  const [activeCategory, setActiveCategory] = useState<string>('');
+  const [menuItems, setMenuItems] = useState<any[] | null>(initialMenuItems.length > 0 ? initialMenuItems : null);
+  const [settings, setSettings] = useState<any>(initialSettings);
+  const [activeCategory, setActiveCategory] = useState<string>(
+    initialCategory || (initialMenuItems.length > 0 ? initialMenuItems[0].category : '')
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
 
@@ -46,32 +60,39 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   useEffect(() => {
     setMounted(true);
     const categoryFromUrl = searchParams.get('category');
-    if (categoryFromUrl) setActiveCategory(categoryFromUrl);
+    if (categoryFromUrl) {
+      setActiveCategory(categoryFromUrl);
+    } else if (initialCategory) {
+      setActiveCategory(initialCategory);
+    }
 
-    const cached = getCached<any[]>('menuItems');
-    if (cached && cached.length > 0) {
-      setMenuItems(cached);
-      // refresh in background without blocking render
-      refreshMenu();
-    } else {
-      refreshMenu();
+    if (!initialMenuItems || initialMenuItems.length === 0) {
+      const cached = getCached<any[]>('menuItems');
+      if (cached && cached.length > 0) {
+        setMenuItems(cached);
+        refreshMenu();
+      } else {
+        refreshMenu();
+      }
     }
 
     const channel = supabase.channel('menu-items')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, refreshMenu)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [refreshMenu, searchParams]);
+  }, [refreshMenu, searchParams, initialMenuItems, initialCategory]);
 
   useEffect(() => {
-    getRestaurantSettings().then(setSettings).catch(() => {});
+    if (!initialSettings) {
+      getRestaurantSettings().then(setSettings).catch(() => {});
+    }
     const channel = supabase.channel('settings')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'restaurant_settings' }, () => {
         getRestaurantSettings().then(setSettings).catch(() => {});
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [initialSettings]);
 
   const filteredItems = useMemo(() => (menuItems ?? []).filter(item => {
     const q = searchQuery.toLowerCase();
@@ -149,25 +170,6 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   };
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-white dark:from-[#050508] dark:to-[#0a0a12] text-black dark:text-white">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 py-8 px-4 max-w-7xl mx-auto">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="animate-pulse rounded-2xl bg-white/5 border border-white/[0.06] p-1.5 sm:p-2 flex gap-2">
-              <div className="w-[8rem] h-[8rem] rounded-xl bg-white/[0.06] shrink-0" />
-              <div className="flex-1 p-2 space-y-2">
-                <div className="h-4 w-3/4 rounded bg-white/[0.06]" />
-                <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
-                <div className="h-5 w-1/3 rounded bg-white/[0.06] mt-auto" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-white dark:from-[#050508] dark:to-[#0a0a12] text-black dark:text-white">
