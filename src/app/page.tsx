@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Star, UtensilsCrossed, Coffee, Wine, Pizza, Cake, Search, ShoppingBag, Smartphone, Scan, CheckCircle, ChefHat, Clock, MapPin, Phone, Quote, Play, Camera, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
-import { getRestaurantSettings } from '@/lib/actions';
+import { getRestaurantSettings, getMenuItems } from '@/lib/actions';
 
 const IMG = {
   food1: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80',
@@ -54,12 +54,14 @@ function useInView(ref: React.RefObject<HTMLDivElement | null>) {
 
 export default function LandingPage() {
   const [settings, setSettings] = useState<any>(null);
+  const [featured, setFeatured] = useState<any[]>([]);
   const { scrollYProgress } = useScroll();
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   useEffect(() => {
     getRestaurantSettings().then(setSettings).catch(() => {});
+    getMenuItems().then(data => setFeatured(data.filter(Boolean).slice(0, 6))).catch(() => {});
   }, []);
 
   const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 50 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-80px' }, transition: { duration: 0.7, delay } });
@@ -85,15 +87,6 @@ export default function LandingPage() {
     { icon: Search, title: 'Browse Menu', description: 'Explore our extensive menu with beautiful food photography', color: 'from-amber-500 to-orange-500' },
     { icon: ShoppingBag, title: 'Place Order', description: 'Add items to your cart and place your order instantly', color: 'from-emerald-500 to-teal-500' },
     { icon: ChefHat, title: 'Enjoy', description: 'Our chefs prepare your meal while you relax', color: 'from-rose-500 to-pink-500' },
-  ];
-
-  const featured = [
-    { name: 'Bright Special Pizza', price: '782.60', image: IMG.food1, category: 'Pizza' },
-    { name: 'Mixed Juice', price: '173.90', image: IMG.food2, category: 'Juice & Shakes' },
-    { name: 'Grilled Fish', price: '521.73', image: IMG.food4, category: 'Fish' },
-    { name: 'Tiramisu', price: '260.86', image: IMG.food6, category: 'Cake & Snacks' },
-    { name: 'Traditional Coffee', price: '34.78', image: IMG.food5, category: 'Hot Drinks' },
-    { name: 'Bright Special Burger', price: '565.21', image: IMG.food3, category: 'Burger & Sandwich' },
   ];
 
   const floatingEmojis = ['🍕', '🥤', '☕', '🍰', '🥗', '🍝', '🥩', '🍦'];
@@ -197,7 +190,7 @@ export default function LandingPage() {
           </motion.div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {featured.map((item, i) => (
-              <motion.div key={item.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+              <motion.div key={item.id || item.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
                 whileHover={{ y: -8 }} className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
               >
                 <Link href="/menu">
