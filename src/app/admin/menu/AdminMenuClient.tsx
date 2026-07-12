@@ -1,14 +1,17 @@
 'use client';
 
 import { MenuManagement } from '@/components/MenuManagement';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
-import { addMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/actions';
-import { setCache } from '@/lib/cache';
+import { getMenuItems, addMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/actions';
+import { getCached, setCache } from '@/lib/cache';
+import { FALLBACK_MENU } from '@/lib/menu-data';
 import { RefreshCw } from 'lucide-react';
 
-export function AdminMenuClient({ initialItems }: { initialItems: any[] }) {
-  const [items, setItems] = useState<any[]>(initialItems);
+const FALLBACK = FALLBACK_MENU.map(item => ({ ...item, available: true }));
+
+export function AdminMenuClient() {
+  const [items, setItems] = useState<any[]>(() => getCached<any[]>('adminMenuItems') || FALLBACK);
   const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -16,17 +19,18 @@ export function AdminMenuClient({ initialItems }: { initialItems: any[] }) {
     checkAdminAuth().then((authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      if (initialItems.length > 0) setCache('adminMenuItems', initialItems);
     });
+    getMenuItems().then(data => {
+      if (data.length > 0) { setItems(data); setCache('adminMenuItems', data); }
+    }).catch(() => {});
   }, []);
 
   const refresh = async () => {
     setRefreshing(true);
     try {
-      const { getMenuItems } = await import('@/lib/actions');
       const data = await getMenuItems();
       if (data.length > 0) { setItems(data); setCache('adminMenuItems', data); }
-    } catch { /* ignore */ }
+    } catch {}
     finally { setRefreshing(false); }
   };
 
