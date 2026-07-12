@@ -11,7 +11,7 @@ export async function getMenuItems() {
 
   // Fetch from database
   const { data, error } = await supabase.from('menu_items').select('id,name,description,price,category,available,rating,created_at').order('id');
-  if (error) throw new Error(error);
+  if (error) throw new Error(error.message);
   
   const items = data || [];
   
