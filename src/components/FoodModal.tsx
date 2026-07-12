@@ -14,6 +14,7 @@ interface FoodModalProps {
     rating: number;
     image: string;
     category: string;
+    available?: boolean;
   };
   isOpen: boolean;
   onClose: () => void;
@@ -77,13 +78,20 @@ export function FoodModal({ item, isOpen, onClose, onAddToCart }: FoodModalProps
                   <X className="w-6 h-6 text-black dark:text-white" />
                 </motion.button>
 
-                {item.image?.startsWith('http') ? (
-                  <img src={item.image} alt={item.name} className="w-full h-64 object-cover" />
-                ) : (
-                  <div className="flex w-full h-64 items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-6xl">
-                    {item.image}
-                  </div>
-                )}
+                <div className="relative">
+                  {item.image?.match(/^(https?|data):/) ? (
+                    <img src={item.image} alt={item.name} className="w-full h-64 object-cover" loading="lazy" decoding="async" />
+                  ) : (
+                    <div className="flex w-full h-64 items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-6xl">
+                      {item.image}
+                    </div>
+                  )}
+                  {!item.available && (
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                      <span className="text-white font-semibold text-lg px-4 py-2 rounded-full bg-red-500/20 border border-red-500/30">Currently Unavailable</span>
+                    </div>
+                  )}
+                </div>
 
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
@@ -188,12 +196,17 @@ export function FoodModal({ item, isOpen, onClose, onAddToCart }: FoodModalProps
                       <p className="text-3xl font-bold text-[#D4AF37]">ETB {totalPrice}</p>
                     </div>
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={item.available ? { scale: 1.05 } : {}}
+                      whileTap={item.available ? { scale: 0.95 } : {}}
                       onClick={handleAddToCart}
-                      className="px-8 py-4 bg-[#D4AF37] text-white rounded-full font-bold text-lg hover:bg-[#B8962F] transition-colors"
+                      disabled={!item.available}
+                      className={`px-8 py-4 rounded-full font-bold text-lg transition-colors ${
+                        item.available
+                          ? 'bg-[#D4AF37] text-white hover:bg-[#B8962F]'
+                          : 'bg-white/10 text-white/30 cursor-not-allowed'
+                      }`}
                     >
-                      Add to Cart
+                      {item.available ? 'Add to Cart' : 'Unavailable'}
                     </motion.button>
                   </div>
                 </div>

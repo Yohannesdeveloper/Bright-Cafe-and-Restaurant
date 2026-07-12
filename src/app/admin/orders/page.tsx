@@ -1,59 +1,79 @@
 'use client';
 
-import { Navigation } from '@/components/Navigation';
 import { OrderManagement } from '@/components/OrderManagement';
 import { useEffect, useState } from 'react';
-import { checkAdminAuth } from '@/lib/admin-auth';
-import { getOrders, updateOrderStatus } from '@/lib/actions';
+import { getOrders, updateOrderStatus, deleteCompletedOrders } from '@/lib/actions';
+import { getCached, setCache } from '@/lib/cache';
+
+const CACHE_KEY = 'admin_orders';
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
+  // null = loading, array = ready (cache only contains real DB data)
+  const [orders, setOrders] = useState<any[] | null>(() => getCached<any[]>(CACHE_KEY) ?? null);
+
+  const refreshOrders = async () => {
+    const data = await getOrders();
+    setOrders(data);
+    setCache(CACHE_KEY, data);
+    return data;
+  };
 
   useEffect(() => {
-    checkAdminAuth().then((authed) => {
-      if (!authed) { window.location.href = '/admin/login'; return; }
-      setAuthorized(true);
-      getOrders().then(setOrders).catch(console.error);
-    });
+    // Auth guaranteed by middleware — fetch immediately
+    refreshOrders().catch(console.error);
   }, []);
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     await updateOrderStatus(orderId, status);
-    setOrders(await getOrders());
+    await refreshOrders();
   };
 
   const handleViewDetails = (order: any) => {
     alert(`Order ${order.id}\nCustomer: ${order.customer}\nTable: ${order.table}\nTotal: ETB ${order.total}`);
   };
 
-  const mappedOrders = orders.map((o: any) => ({
-    id: o.id,
-    customer: o.customer,
-    table: o.table_number,
-    items: o.items || [],
-    total: o.total,
-    status: o.status,
-    time: new Date(o.created_at).toLocaleString(),
-    notes: o.notes,
+  const mappedOrders = (orders ?? []).map((o: any) => ({
+    id: o.id, customer: o.customer, table: o.table_number,
+    items: o.items || [], total: o.total, status: o.status,
+    time: new Date(o.created_at).toLocaleString(), notes: o.notes,
   }));
 
-  if (authorized === null) {
+  const handleClearHistory = async () => {
+    await deleteCompletedOrders();
+    await refreshOrders();
+  };
+
+  // Show skeleton on true first load (no cache available)
+  if (orders === null) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full" />
+      <div className="p-4 sm:p-6 lg:p-8 space-y-3 animate-pulse">
+        <div className="flex items-center justify-between mb-4">
+          <div className="h-7 w-32 rounded-lg bg-white/[0.06]" />
+          <div className="h-9 w-44 rounded-lg bg-white/[0.06]" />
+        </div>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-white/[0.05] bg-white/[0.02]">
+            <div className="w-10 h-10 rounded-lg bg-white/[0.06] shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 w-32 rounded bg-white/[0.06]" />
+              <div className="h-3 w-48 rounded bg-white/[0.04]" />
+            </div>
+            <div className="h-6 w-20 rounded-full bg-white/[0.06]" />
+          </div>
+        ))}
       </div>
     );
   }
 
-  if (!authorized) return null;
-
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <Navigation role="admin" />
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <OrderManagement orders={mappedOrders} onUpdateStatus={handleUpdateStatus as any} onViewDetails={handleViewDetails as any} />
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-white/90">All Orders</h2>
+        <button onClick={handleClearHistory} className="px-4 py-2 text-sm rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
+          Clear Completed History
+        </button>
       </div>
+      <OrderManagement orders={mappedOrders} onUpdateStatus={handleUpdateStatus as any} onViewDetails={handleViewDetails as any} />
     </div>
   );
 }

@@ -47,8 +47,8 @@ export function Favorites({ items, onRemove, onAddToCart }: FavoritesProps) {
           <GlassCard className="overflow-hidden h-full">
             <div className="relative">
               <div className="h-48 bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 flex items-center justify-center overflow-hidden">
-                {item.image?.startsWith('http') ? (
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                {item.image?.match(/^(https?|data):/) ? (
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 ) : (
                   <span className="text-6xl">{item.image}</span>
                 )}

@@ -29,7 +29,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://plus.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -3,11 +3,10 @@ import { Suspense } from 'react';
 
 const MenuView = dynamic(() => import('@/components/MenuView').then(m => ({ default: m.MenuView })));
 
-export default async function TableMenu({ params }: { params: Promise<{ table: string }> }) {
-  const { table } = await params;
+export default function MenuPage() {
   return (
     <Suspense fallback={null}>
-      <MenuView key={table} tableNumber={table} />
+      <MenuView />
     </Suspense>
   );
 }

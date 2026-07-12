@@ -1,389 +1,257 @@
 'use client';
 
-import { Navigation } from '@/components/Navigation';
-import { GlassCard } from '@/components/GlassCard';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, 
-  Users, 
-  ShoppingCart, 
-  DollarSign, 
-  Clock,
-  Star,
-  ChefHat,
-  Utensils,
-  LogOut,
-  Package,
-  MessageSquare,
-  Settings,
-  Table
+import {
+  TrendingUp, ShoppingCart, DollarSign, ArrowUpRight,
+  ArrowDownRight, Clock, Star, ChefHat, Utensils,
+  Table, Sparkles, Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getMenuItems, getOrders } from '@/lib/actions';
-import { checkAdminAuth, logoutAdmin } from '@/lib/admin-auth';
+import { getCached, setCache } from '@/lib/cache';
+import { cn } from '@/lib/utils';
+
+const MENU_CACHE = 'admin_menu_items_v2';
+const ORDERS_CACHE = 'admin_orders';
+
+const quickActions = [
+  { label: 'Menu', href: '/admin/menu', icon: Utensils, desc: 'Manage dishes & categories', color: 'from-amber-500/10 to-amber-600/5', border: 'border-amber-500/20', iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400' },
+  { label: 'Orders', href: '/admin/orders', icon: ShoppingCart, desc: 'Track & fulfill orders', color: 'from-blue-500/10 to-blue-600/5', border: 'border-blue-500/20', iconBg: 'bg-blue-500/15', iconColor: 'text-blue-400' },
+  { label: 'Tables', href: '/admin/tables', icon: Table, desc: 'Manage seating & QR', color: 'from-emerald-500/10 to-emerald-600/5', border: 'border-emerald-500/20', iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
+];
+
+const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
+const itemAnim = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 export default function AdminDashboard() {
-  const [menuItems, setMenuItems] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
+  // Load from cache immediately — no loading state
+  const [menuItems, setMenuItems] = useState<any[]>(() => getCached<any[]>(MENU_CACHE) ?? []);
+  const [orders, setOrders] = useState<any[]>(() => getCached<any[]>(ORDERS_CACHE) ?? []);
 
   useEffect(() => {
-    checkAdminAuth().then((authed) => {
-      if (!authed) {
-        window.location.href = '/admin/login';
-      } else {
-        setAuthorized(true);
-        getMenuItems().then(setMenuItems).catch(console.error);
-        getOrders().then(setOrders).catch(console.error);
-      }
-    });
+    // Auth guaranteed by middleware — fetch both in parallel
+    Promise.all([
+      getMenuItems().then(data => { setMenuItems(data); setCache(MENU_CACHE, data); }).catch(() => {}),
+      getOrders().then(data => { setOrders(data); setCache(ORDERS_CACHE, data); }).catch(() => {}),
+    ]);
   }, []);
 
-  const handleLogout = async () => {
-    await logoutAdmin();
-    window.location.href = '/admin/login';
-  };
-
-  const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
-  const averageRating = menuItems.length
-    ? (menuItems.reduce((sum, i) => sum + i.rating, 0) / menuItems.length).toFixed(1)
+  const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
+  const avgRating = menuItems.length
+    ? (menuItems.reduce((s, i) => s + i.rating, 0) / menuItems.length).toFixed(1)
     : '0.0';
 
-  const stats = [
-    {
-      title: 'Total Revenue',
-      value: `ETB ${totalRevenue.toLocaleString()}`,
-      change: '+12.5%',
-      icon: <DollarSign className="w-6 h-6" />,
-      trend: 'up',
-    },
-    {
-      title: 'Total Orders',
-      value: orders.length.toString(),
-      change: '+8.2%',
-      icon: <ShoppingCart className="w-6 h-6" />,
-      trend: 'up',
-    },
-    {
-      title: 'Menu Items',
-      value: menuItems.length.toString(),
-      change: '+15.3%',
-      icon: <Users className="w-6 h-6" />,
-      trend: 'up',
-    },
-    {
-      title: 'Average Rating',
-      value: averageRating,
-      change: '+0.2',
-      icon: <Star className="w-6 h-6" />,
-      trend: 'up',
-    },
-  ];
-
-  const recentOrders = orders.slice(0, 4).map(order => ({
-    id: order.id,
-    customer: order.customer,
-    items: order.items.map((i: any) => i.name).join(', '),
-    total: `ETB ${order.total}`,
-    status: order.status,
-    time: new Date(order.created_at).toLocaleDateString(),
-  }));
-
-  const topDishes = menuItems
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 4)
-    .map(item => ({
-      name: item.name,
-      orders: Math.floor(Math.random() * 50) + 20,
-      revenue: `ETB ${(item.price * (Math.floor(Math.random() * 50) + 20)).toLocaleString()}`,
-      rating: item.rating,
-    }));
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-        return 'bg-blue-500/20 text-blue-500';
-      case 'preparing':
-        return 'bg-yellow-500/20 text-yellow-500';
-      case 'ready':
-        return 'bg-green-500/20 text-green-500';
-      case 'served':
-        return 'bg-[#D4AF37]/20 text-[#D4AF37]';
-      default:
-        return 'bg-gray-500/20 text-gray-500';
-    }
-  };
-
-  if (authorized === null) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (!authorized) return null;
+  const recentOrders = orders.slice(0, 5);
+  const topDishes = [...menuItems].sort((a, b) => b.rating - a.rating).slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <Navigation role="admin" />
-      
-      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-black dark:text-white mb-2">
-                  Admin Dashboard
-                </h1>
-                <p className="text-black/60 dark:text-white/60">
-                  Welcome back! Here's what's happening today.
-                </p>
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleLogout}
-                className="px-4 py-2 border-2 border-[#D4AF37]/30 text-black dark:text-white rounded-full font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center space-x-2"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </motion.button>
-            </div>
-          </motion.div>
+    <div className="p-4 sm:p-6 lg:p-8">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/20 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-[#D4AF37]" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
+            <p className="text-sm text-white/40">Your restaurant at a glance</p>
+          </div>
+        </div>
+      </motion.div>
 
-          {/* Stats Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+      {/* Stats Grid */}
+      <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[
+          { value: `ETB ${totalRevenue.toLocaleString()}`, label: 'Total Revenue', icon: DollarSign, trend: '+12.5%', up: true, color: 'emerald' },
+          { value: orders.length.toString(), label: 'Total Orders', icon: ShoppingCart, trend: '+8.2%', up: true, color: 'blue' },
+          { value: menuItems.length.toString(), label: 'Menu Items', icon: Utensils, trend: '+3.1%', up: true, color: 'amber' },
+          { value: avgRating, label: 'Avg Rating', icon: Star, trend: '+0.2', up: true, color: 'purple' },
+        ].map((stat) => (
+          <motion.div key={stat.label} variants={itemAnim}
+            className="relative group cursor-pointer"
           >
-            {stats.map((stat, index) => (
-              <GlassCard key={stat.title} className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    {stat.icon}
+            <div className={cn(
+              'relative overflow-hidden rounded-2xl border p-5',
+              `border-${stat.color}-500/20`,
+              `bg-gradient-to-br from-${stat.color}-500/[0.07] to-${stat.color}-600/[0.03]`,
+              'hover:border-opacity-40 transition-all duration-300'
+            )}>
+              <div className={cn(
+                'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500',
+                `bg-gradient-to-br from-${stat.color}-500/5 to-transparent`
+              )} />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <div className={cn(
+                    'w-10 h-10 rounded-xl flex items-center justify-center',
+                    `bg-${stat.color}-500/15`
+                  )}>
+                    <stat.icon className={cn('w-5 h-5', `text-${stat.color}-400`)} />
                   </div>
-                  <span className={`text-sm font-medium ${
-                    stat.trend === 'up' ? 'text-green-500' : 'text-red-500'
-                  }`}>
-                    {stat.change}
+                  <span className={cn(
+                    'flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full',
+                    stat.up ? `bg-${stat.color}-500/10 text-${stat.color}-400` : 'bg-red-500/10 text-red-400'
+                  )}>
+                    {stat.up ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                    {stat.trend}
                   </span>
                 </div>
-                <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                  {stat.value}
-                </h3>
-                <p className="text-sm text-black/60 dark:text-white/60">
-                  {stat.title}
-                </p>
-              </GlassCard>
-            ))}
-          </motion.div>
-
-          {/* Charts and Tables Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Recent Orders */}
-            <GlassCard className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-black dark:text-white">
-                  Recent Orders
-                </h2>
-                <button className="text-[#D4AF37] text-sm font-medium hover:underline">
-                  View All
-                </button>
+                <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>
+                <p className="text-xs text-white/40">{stat.label}</p>
               </div>
-              
-              <div className="space-y-4">
-                {recentOrders.map((order, index) => (
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Recent Orders */}
+        <motion.div variants={itemAnim} initial="hidden" animate="show"
+          className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.03] to-transparent overflow-hidden"
+        >
+          <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center">
+                <Activity className="w-4 h-4 text-blue-400" />
+              </div>
+              <h2 className="text-sm font-semibold text-white">Recent Orders</h2>
+            </div>
+            <Link href="/admin/orders" className="text-xs text-[#D4AF37]/70 hover:text-[#D4AF37] transition-colors">
+              View All
+            </Link>
+          </div>
+          <div className="p-5">
+            {recentOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <ShoppingCart className="w-10 h-10 text-white/10 mx-auto mb-3" />
+                <p className="text-sm text-white/30">No orders yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentOrders.map((order, i) => (
                   <motion.div
                     key={order.id}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-center justify-between p-4 bg-white/40 dark:bg-black/40 rounded-xl border border-[#D4AF37]/10"
+                    transition={{ delay: i * 0.05 }}
+                    className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors border border-white/[0.04]"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-1">
-                        <span className="font-bold text-black dark:text-white">
-                          {order.customer}
-                        </span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-blue-400">#{order.id?.toString().slice(-4)}</span>
                       </div>
-                      <p className="text-sm text-black/60 dark:text-white/60">
-                        {order.items}
-                      </p>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{order.customer || 'Guest'}</p>
+                        <p className="text-xs text-white/40 truncate">
+                          {order.items?.slice(0, 2).map((i: any) => i.name).join(', ')}
+                          {order.items?.length > 2 ? ` +${order.items.length - 2}` : ''}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-black dark:text-white">{order.total}</p>
-                      <p className="text-xs text-black/40 dark:text-white/40">{order.time}</p>
+                    <div className="text-right shrink-0 ml-3">
+                      <p className="text-sm font-semibold text-white">ETB {order.total}</p>
+                      <span className={cn(
+                        'text-xs px-2 py-0.5 rounded-full',
+                        order.status === 'confirmed' && 'bg-blue-500/10 text-blue-400',
+                        order.status === 'preparing' && 'bg-amber-500/10 text-amber-400',
+                        order.status === 'ready' && 'bg-emerald-500/10 text-emerald-400',
+                        order.status === 'served' && 'bg-[#D4AF37]/10 text-[#D4AF37]',
+                      )}>{order.status}</span>
                     </div>
                   </motion.div>
                 ))}
               </div>
-            </GlassCard>
+            )}
+          </div>
+        </motion.div>
 
-            {/* Top Dishes */}
-            <GlassCard className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-black dark:text-white">
-                  Top Dishes
-                </h2>
-                <button className="text-[#D4AF37] text-sm font-medium hover:underline">
-                  View All
-                </button>
+        {/* Top Dishes */}
+        <motion.div variants={itemAnim} initial="hidden" animate="show"
+          className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.03] to-transparent overflow-hidden"
+        >
+          <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center">
+                <ChefHat className="w-4 h-4 text-amber-400" />
               </div>
-              
-              <div className="space-y-4">
-                {topDishes.map((dish, index) => (
+              <h2 className="text-sm font-semibold text-white">Top Rated Dishes</h2>
+            </div>
+            <Link href="/admin/menu" className="text-xs text-[#D4AF37]/70 hover:text-[#D4AF37] transition-colors">
+              View All
+            </Link>
+          </div>
+          <div className="p-5">
+            {topDishes.length === 0 ? (
+              <div className="text-center py-8">
+                <Utensils className="w-10 h-10 text-white/10 mx-auto mb-3" />
+                <p className="text-sm text-white/30">No dishes yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {topDishes.map((dish, i) => (
                   <motion.div
-                    key={dish.name}
-                    initial={{ opacity: 0, x: 20 }}
+                    key={dish.id}
+                    initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-center justify-between p-4 bg-white/40 dark:bg-black/40 rounded-xl border border-[#D4AF37]/10"
+                    transition={{ delay: i * 0.05 }}
+                    className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors border border-white/[0.04]"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-lg font-bold text-[#D4AF37]">
-                        {index + 1}
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold text-amber-400">#{i + 1}</span>
                       </div>
                       <div>
-                        <h3 className="font-bold text-black dark:text-white">
-                          {dish.name}
-                        </h3>
-                        <div className="flex items-center space-x-2 text-sm">
-                          <Star className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" />
-                          <span className="text-black/60 dark:text-white/60">
-                            {dish.rating}
-                          </span>
+                        <p className="text-sm font-medium text-white">{dish.name}</p>
+                        <div className="flex items-center gap-1.5">
+                          <Star className="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]" />
+                          <span className="text-xs text-white/40">{dish.rating?.toFixed(1) || '0.0'}</span>
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-black dark:text-white">{dish.revenue}</p>
-                      <p className="text-xs text-black/40 dark:text-white/40">{dish.orders} orders</p>
+                      <p className="text-sm font-semibold text-white">ETB {dish.price}</p>
+                      <p className="text-xs text-white/40">{dish.category}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
-            </GlassCard>
+            )}
           </div>
-
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            <Link href="/admin/menu">
-              <GlassCard className="p-6 cursor-pointer hover:border-[#D4AF37]/40 transition-all">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    <Utensils className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">Manage Menu</h3>
-                    <p className="text-sm text-black/60 dark:text-white/60">Add/Edit dishes</p>
-                  </div>
-                </div>
-              </GlassCard>
-            </Link>
-
-            <Link href="/admin/orders">
-              <GlassCard className="p-6 cursor-pointer hover:border-[#D4AF37]/40 transition-all">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    <ChefHat className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">Orders</h3>
-                    <p className="text-sm text-black/60 dark:text-white/60">Manage orders</p>
-                  </div>
-                </div>
-              </GlassCard>
-            </Link>
-
-            <Link href="/admin/tables">
-              <GlassCard className="p-6 cursor-pointer hover:border-[#D4AF37]/40 transition-all">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    <Table className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">Tables</h3>
-                    <p className="text-sm text-black/60 dark:text-white/60">Manage tables & QR codes</p>
-                  </div>
-                </div>
-              </GlassCard>
-            </Link>
-
-            <Link href="/admin/staff">
-              <GlassCard className="p-6 cursor-pointer hover:border-[#D4AF37]/40 transition-all">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">Staff</h3>
-                    <p className="text-sm text-black/60 dark:text-white/60">Manage staff</p>
-                  </div>
-                </div>
-              </GlassCard>
-            </Link>
-
-            <Link href="/admin/reviews">
-              <GlassCard className="p-6 cursor-pointer hover:border-[#D4AF37]/40 transition-all">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    <MessageSquare className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">Reviews</h3>
-                    <p className="text-sm text-black/60 dark:text-white/60">Manage reviews</p>
-                  </div>
-                </div>
-              </GlassCard>
-            </Link>
-
-            <Link href="/admin/inventory">
-              <GlassCard className="p-6 cursor-pointer hover:border-[#D4AF37]/40 transition-all">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    <Package className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">Inventory</h3>
-                    <p className="text-sm text-black/60 dark:text-white/60">Track stock levels</p>
-                  </div>
-                </div>
-              </GlassCard>
-            </Link>
-
-            <Link href="/admin/settings">
-              <GlassCard className="p-6 cursor-pointer hover:border-[#D4AF37]/40 transition-all">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#D4AF37]/20 rounded-full flex items-center justify-center text-[#D4AF37]">
-                    <Settings className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-black dark:text-white">Settings</h3>
-                    <p className="text-sm text-black/60 dark:text-white/60">Restaurant settings</p>
-                  </div>
-                </div>
-              </GlassCard>
-            </Link>
-          </motion.div>
-        </div>
+        </motion.div>
       </div>
+
+      {/* Quick Actions */}
+      <motion.div variants={container} initial="hidden" animate="show">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="w-4 h-4 text-[#D4AF37]" />
+          <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider">Quick Actions</h2>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {quickActions.map((action) => (
+            <motion.div key={action.label} variants={itemAnim}>
+              <Link href={action.href}>
+                <div className={cn(
+                  'relative group rounded-xl border p-4 h-full',
+                  action.border,
+                  `bg-gradient-to-br ${action.color}`,
+                  'hover:border-opacity-50 transition-all duration-300 cursor-pointer'
+                )}>
+                  <div className={cn(
+                    'w-9 h-9 rounded-lg flex items-center justify-center mb-3',
+                    action.iconBg
+                  )}>
+                    <action.icon className={cn('w-4 h-4', action.iconColor)} />
+                  </div>
+                  <p className="text-sm font-semibold text-white mb-0.5">{action.label}</p>
+                  <p className="text-xs text-white/40">{action.desc}</p>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }
