@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag,
   Table2, LogOut, ChefHat,
@@ -48,13 +49,11 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{ width: collapsed ? 72 : 280 }}
+      <aside
         className={cn(
           'fixed left-0 top-0 z-50 h-screen bg-[#0a0a12] border-r border-white/[0.06]',
-          'hidden lg:flex flex-col',
-          collapsed ? 'items-center' : ''
+          'hidden lg:flex flex-col transition-[width] duration-200',
+          collapsed ? 'items-center w-[72px]' : 'w-[280px]'
         )}
       >
         {/* Logo */}
@@ -81,9 +80,9 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => {
             const active = pathname === item.href;
             return (
-              <motion.button
+              <Link
                 key={item.href}
-                onClick={() => router.push(item.href)}
+                href={item.href}
                 className={cn(
                   'relative flex items-center w-full rounded-xl transition-all duration-200',
                   collapsed ? 'justify-center h-11 w-11 mx-auto' : 'px-3 py-2.5 gap-3',
@@ -91,8 +90,6 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                     ? 'bg-gradient-to-r from-[#D4AF37]/15 to-transparent text-[#D4AF37]'
                     : 'text-white/50 hover:text-white/80 hover:bg-white/[0.04]'
                 )}
-                whileHover={{ x: collapsed ? 0 : 4 }}
-                whileTap={{ scale: 0.97 }}
               >
                 {active && (
                   <motion.div
@@ -112,7 +109,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
                 {!collapsed && item.badge && (
                   <span className="ml-auto relative z-10 w-2 h-2 rounded-full bg-[#D4AF37] shadow-[0_0_6px_rgba(212,175,55,0.5)]" />
                 )}
-              </motion.button>
+              </Link>
             );
           })}
         </nav>
@@ -140,7 +137,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             {!collapsed && <span className="text-sm">Logout</span>}
           </button>
         </div>
-      </motion.aside>
+      </aside>
 
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-30 h-14 bg-[#0a0a12] border-b border-white/[0.06] flex items-center justify-between px-4">
@@ -164,7 +161,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             initial={{ x: -300 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            transition={{ type: 'tween', duration: 0.2, ease: 'easeOut' }}
             className="fixed left-0 top-0 z-50 h-screen w-[260px] bg-[#0a0a12] border-r border-white/[0.06] lg:hidden flex flex-col"
           >
             <div className="flex items-center justify-between h-14 px-4 border-b border-white/[0.06]">

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { checkWaiterAuth, logoutWaiter } from '@/lib/waiter-auth';
 import { LogOut, ShoppingBag, User, LayoutDashboard, Table2 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function WaiterLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -39,18 +40,18 @@ export default function WaiterLayout({ children }: { children: React.ReactNode }
             <span className="text-sm font-medium text-white/80">{waiter?.name || 'Waiter'}</span>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => router.push('/waiter/dashboard')}
+            <Link href="/waiter/dashboard"
               className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all flex items-center gap-1.5">
               <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
-            </button>
-            <button onClick={() => router.push('/waiter/orders')}
+            </Link>
+            <Link href="/waiter/orders"
               className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all flex items-center gap-1.5">
               <ShoppingBag className="w-3.5 h-3.5" /> Orders
-            </button>
-            <button onClick={() => router.push('/waiter/tables')}
+            </Link>
+            <Link href="/waiter/tables"
               className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.06] transition-all flex items-center gap-1.5">
               <Table2 className="w-3.5 h-3.5" /> Tables
-            </button>
+            </Link>
             <button onClick={handleLogout}
               className="px-3 py-1.5 rounded-lg text-xs font-medium text-white/40 hover:text-red-400 hover:bg-white/[0.06] transition-all flex items-center gap-1.5">
               <LogOut className="w-3.5 h-3.5" /> Logout
