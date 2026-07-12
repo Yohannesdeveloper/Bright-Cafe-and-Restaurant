@@ -84,20 +84,22 @@ export function TableManagement({ tables, onAdd, onEdit, onDelete }: TableManage
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {table.status === 'available' && (
-                    <button onClick={() => onEdit(table.id, { status: 'reserved' })}
-                      className="flex-1 px-3 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-medium hover:brightness-110 transition-all flex items-center justify-center gap-1.5">
-                      Reserve
-                    </button>
-                  )}
-                  {table.status === 'reserved' && (
-                    <button onClick={() => onEdit(table.id, { status: 'available' })}
-                      className="flex-1 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-medium hover:bg-white/[0.08] transition-all flex items-center justify-center gap-1.5">
-                      Cancel Reserve
-                    </button>
-                  )}
+                  <select
+                    value={table.status}
+                    onChange={(e) => onEdit(table.id, { status: e.target.value as any })}
+                    className={cn(
+                      'flex-1 px-2 py-2 rounded-xl text-xs font-medium border transition-all appearance-none cursor-pointer text-center',
+                      table.status === 'available' && 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
+                      table.status === 'reserved' && 'bg-amber-500/15 border-amber-500/30 text-amber-400',
+                      table.status === 'occupied' && 'bg-red-500/15 border-red-500/30 text-red-400',
+                    )}
+                  >
+                    <option value="available" className="bg-[#0a0a12] text-emerald-400">Available</option>
+                    <option value="reserved" className="bg-[#0a0a12] text-amber-400">Reserved</option>
+                    <option value="occupied" className="bg-[#0a0a12] text-red-400">Occupied</option>
+                  </select>
                   <button onClick={() => setSelectedTable({ ...table, qrCode: getMenuUrl(table.number) })}
-                    className="flex-1 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-medium hover:bg-white/[0.08] hover:text-[#D4AF37] transition-all flex items-center justify-center gap-1.5">
+                    className="px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-medium hover:bg-white/[0.08] hover:text-[#D4AF37] transition-all flex items-center justify-center gap-1.5">
                     <QrCode className="w-3.5 h-3.5" /> QR
                   </button>
                 </div>
