@@ -119,10 +119,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050508]/80 backdrop-blur-xl border-b border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/30 flex items-center justify-center">
-              <span className="text-[#D4AF37] text-sm font-bold">B</span>
-            </div>
-            <span className="font-semibold text-sm hidden sm:block">Bright Cafe</span>
+            <img src="/PNG-01.png" alt="Bright Cafe" className="h-9 w-auto" />
           </div>
           <div className="flex items-center gap-6">
             <Link href="/menu" className="text-sm text-white/60 hover:text-white transition-colors">Menu</Link>
