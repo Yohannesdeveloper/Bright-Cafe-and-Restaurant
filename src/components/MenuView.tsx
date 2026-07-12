@@ -5,6 +5,7 @@ import { Cart } from '@/components/Cart';
 import { ShoppingBag, Plus, Search, Globe, Camera, MessageCircle, Play, Phone, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
 import { getCached, setCache } from '@/lib/cache';
 import { supabase } from '@/lib/supabase';
@@ -22,13 +23,14 @@ interface CartItem {
 }
 
 export function MenuView({ tableNumber }: { tableNumber?: string }) {
+  const searchParams = useSearchParams();
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [menuItems, setMenuItems] = useState<any[]>(FALLBACK_MENU.map(i => ({ ...i, available: true })));
   const [settings, setSettings] = useState<any>(null);
-  const [activeCategory, setActiveCategory] = useState<string>('');
+  const [activeCategory, setActiveCategory] = useState<string>(searchParams.get('category') || '');
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchAndMergeMenu = useCallback(async () => {
@@ -345,77 +347,62 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
 
       {/* Footer */}
       <footer className="border-t border-black/10 dark:border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="text-center md:text-left md:col-span-1">
-              <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="h-12 w-auto mx-auto md:mx-0 mb-3" />
-              <h3 className="text-sm font-semibold text-black dark:text-white">{settings?.name || 'Bright Cafe and Restaurant'}</h3>
-              {settings?.description && (
-                <p className="text-xs text-black/50 dark:text-white/50 mt-1">{settings.description}</p>
-              )}
-            </div>
+        <div className="mx-auto max-w-4xl px-4 py-16">
+          {/* Logo + Brand */}
+          <div className="text-center mb-10">
+            <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="h-20 w-auto mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-black dark:text-white">{settings?.name || 'Bright Cafe and Restaurant'}</h3>
+            {settings?.description && (
+              <p className="text-sm text-black/50 dark:text-white/50 mt-1 max-w-md mx-auto">{settings.description}</p>
+            )}
+          </div>
 
-            {/* Quick Links */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+            {/* Contact */}
             <div className="text-center md:text-left">
-              <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Scan to Order</h3>
-              <div className="inline-flex items-center justify-center w-32 h-32 rounded-2xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 p-2">
-                <QRCodeSVG value="https://bright-cafe-and-restaurant.vercel.app/menu" size={120} level="H" includeMargin fgColor="#000000" bgColor="#ffffff" className="w-full h-full" />
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 mb-4">Contact</h4>
+              <div className="space-y-3 text-sm text-black/60 dark:text-white/60">
+                <a href={`tel:${settings?.phone || '+251-XXX-XXXXXX'}`} className="flex items-center justify-center md:justify-start gap-3 hover:text-[#D4AF37] transition-colors">
+                  <Phone className="h-4 w-4 shrink-0" /> {settings?.phone || '+251-XXX-XXXXXX'}
+                </a>
+                <a href={`https://maps.google.com/?q=${encodeURIComponent(settings?.address || 'Bright cafe & restaurant')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center md:justify-start gap-3 hover:text-[#D4AF37] transition-colors">
+                  <MapPin className="h-4 w-4 shrink-0" /> {settings?.address || 'Bright cafe & restaurant'}
+                </a>
               </div>
             </div>
 
-            {/* Contact */}
-            <div className="text-center md:text-left">
-              <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Contact Us</h3>
-              <div className="space-y-2 text-sm text-black/60 dark:text-white/60">
-                <a href={`tel:${settings?.phone || '+251-XXX-XXXXXX'}`} className="flex items-center justify-center md:justify-start gap-2 hover:text-[#D4AF37] transition-colors">
-                  <Phone className="h-4 w-4" /> {settings?.phone || '+251-XXX-XXXXXX'}
-                </a>
-                <a href={`https://maps.google.com/?q=${encodeURIComponent(settings?.address || 'Bright cafe & restaurant')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center md:justify-start gap-2 hover:text-[#D4AF37] transition-colors">
-                  <MapPin className="h-4 w-4" /> {settings?.address || 'Bright cafe & restaurant'}
-                </a>
+            {/* Scan to Order */}
+            <div className="text-center">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 mb-4">Scan to Order</h4>
+              <div className="inline-flex items-center justify-center w-28 h-28 rounded-2xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 p-2 mx-auto">
+                <QRCodeSVG value="https://bright-cafe-and-restaurant.vercel.app/menu" size={100} level="H" includeMargin fgColor="#000000" bgColor="#ffffff" className="w-full h-full" />
               </div>
             </div>
 
             {/* Social Media */}
-            <div className="text-center md:text-left">
-              <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Follow Us</h3>
-              <div className="grid grid-cols-5 gap-4">
-                <a href={settings?.website || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
-                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
-                    <Globe className="h-5 w-5" />
-                  </div>
-                  <span className="text-[10px] font-medium">Website</span>
+            <div className="text-center md:text-right">
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 mb-4">Follow Us</h4>
+              <div className="flex items-center justify-center md:justify-end gap-3">
+                <a href={settings?.website || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] text-black/60 dark:text-white/60 transition-all">
+                  <Globe className="h-4 w-4" />
                 </a>
-                <a href={(settings as any)?.instagram || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
-                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
-                    <Camera className="h-5 w-5" />
-                  </div>
-                  <span className="text-[10px] font-medium">Instagram</span>
+                <a href={(settings as any)?.instagram || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] text-black/60 dark:text-white/60 transition-all">
+                  <Camera className="h-4 w-4" />
                 </a>
-                <a href={(settings as any)?.telegram || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
-                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
-                    <MessageCircle className="h-5 w-5" />
-                  </div>
-                  <span className="text-[10px] font-medium">Telegram</span>
+                <a href={(settings as any)?.telegram || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] text-black/60 dark:text-white/60 transition-all">
+                  <MessageCircle className="h-4 w-4" />
                 </a>
-                <a href={(settings as any)?.facebook || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
-                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                  </div>
-                  <span className="text-[10px] font-medium">Facebook</span>
+                <a href={(settings as any)?.facebook || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] text-black/60 dark:text-white/60 transition-all">
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href={(settings as any)?.tiktok || '#'} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 text-black/60 dark:text-white/60 hover:text-[#D4AF37] transition-colors group">
-                  <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37]/10 transition-all">
-                    <Play className="h-5 w-5" />
-                  </div>
-                  <span className="text-[10px] font-medium">TikTok</span>
+                <a href={(settings as any)?.tiktok || '#'} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] text-black/60 dark:text-white/60 transition-all">
+                  <Play className="h-4 w-4" />
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-black/10 dark:border-white/10 text-center">
+          <div className="mt-12 pt-6 border-t border-black/10 dark:border-white/10 text-center">
             <p className="text-xs text-black/60 dark:text-white/60">
               No service charge applies. Kindly note that prices are subject to 15% VAT.
             </p>

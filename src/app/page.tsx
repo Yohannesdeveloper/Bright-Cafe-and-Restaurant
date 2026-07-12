@@ -85,12 +85,12 @@ export default function LandingPage() {
   const sectionHeaderClass = (delay: number) => `animate-fade-in-up anim-delay-${delay}`;
 
   const categories = [
-    { icon: Coffee, label: 'Hot Drinks', color: 'from-amber-500/20 to-amber-600/10', emoji: '☕' },
-    { icon: Wine, label: 'Beverages', color: 'from-blue-500/20 to-blue-600/10', emoji: '🥤' },
-    { icon: Pizza, label: 'Pizza', color: 'from-orange-500/20 to-orange-600/10', emoji: '🍕' },
-    { icon: Cake, label: 'Cake & Snacks', color: 'from-pink-500/20 to-pink-600/10', emoji: '🍰' },
-    { icon: UtensilsCrossed, label: 'Habesha Food', color: 'from-emerald-500/20 to-emerald-600/10', emoji: '🇪🇹' },
-    { icon: Search, label: 'All Categories', color: 'from-[#D4AF37]/20 to-[#D4AF37]/10', emoji: '✨' },
+    { icon: Coffee, label: 'Hot Drinks', category: 'Hot Drinks', color: 'from-amber-500/20 to-amber-600/10', emoji: '☕' },
+    { icon: Wine, label: 'Beverages', category: 'Beverages & Drinks', color: 'from-blue-500/20 to-blue-600/10', emoji: '🥤' },
+    { icon: Pizza, label: 'Pizza', category: 'Pizza', color: 'from-orange-500/20 to-orange-600/10', emoji: '🍕' },
+    { icon: Cake, label: 'Cake & Snacks', category: 'Cake & Snacks', color: 'from-pink-500/20 to-pink-600/10', emoji: '🍰' },
+    { icon: UtensilsCrossed, label: 'Habesha Food', category: 'የሐበሻ ምግብ (Habesha Food)', color: 'from-emerald-500/20 to-emerald-600/10', emoji: '🇪🇹' },
+    { icon: Search, label: 'All Categories', category: '', color: 'from-[#D4AF37]/20 to-[#D4AF37]/10', emoji: '✨' },
   ];
 
   const testimonials = [
@@ -295,7 +295,7 @@ export default function LandingPage() {
               <motion.div key={cat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
                 whileHover={{ y: -6, scale: 1.02 }}
               >
-                <Link href="/menu" className="block h-full">
+                <Link href={cat.category ? `/menu?category=${encodeURIComponent(cat.category)}` : '/menu'} className="block h-full">
                   <div className={`relative h-full p-6 rounded-2xl border border-white/[0.06] bg-gradient-to-br ${cat.color} overflow-hidden group`}>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="relative z-10 flex flex-col items-center gap-3">

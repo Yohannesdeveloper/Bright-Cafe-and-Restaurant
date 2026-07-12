@@ -1,5 +1,12 @@
-import { MenuView } from '@/components/MenuView';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+
+const MenuView = dynamic(() => import('@/components/MenuView').then(m => m.MenuView));
 
 export default function MenuPage() {
-  return <MenuView />;
+  return (
+    <Suspense fallback={null}>
+      <MenuView />
+    </Suspense>
+  );
 }
