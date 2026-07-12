@@ -136,6 +136,7 @@ export default function LandingPage() {
             <Link href="/menu" className="text-sm text-white/60 hover:text-white transition-colors">Menu</Link>
             <a href="#how-it-works" className="text-sm text-white/60 hover:text-white transition-colors hidden sm:block">How It Works</a>
             <a href="#gallery" className="text-sm text-white/60 hover:text-white transition-colors hidden sm:block">Gallery</a>
+            <a href="#events" className="text-sm text-white/60 hover:text-white transition-colors hidden sm:block">Events</a>
             <a href="#contact" className="text-sm text-white/60 hover:text-white transition-colors hidden sm:block">Contact</a>
             <Link href="/menu" className="px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-black text-sm font-semibold rounded-full hover:brightness-110 transition-all">
               Order Now
@@ -406,6 +407,39 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Events */}
+      <section id="events" className="relative px-4 py-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/3 via-transparent to-transparent" />
+        <div className="relative max-w-6xl mx-auto">
+          <div className={`text-center mb-14 ${sectionHeaderClass(0)}`}>
+            <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Events</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Upcoming <span className="text-[#D4AF37]">Events</span></h2>
+            <p className="text-white/40 text-lg">Join us for special nights and celebrations</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { title: 'Live Jazz Night', date: 'Every Friday', time: '7:00 PM - 10:00 PM', desc: 'Enjoy smooth jazz while you dine', icon: '🎷' },
+              { title: 'Weekend Brunch', date: 'Sat & Sun', time: '9:00 AM - 2:00 PM', desc: 'All-you-can-eat brunch buffet', icon: '🥂' },
+              { title: 'Cultural Evening', date: 'Every Saturday', time: '6:00 PM - 9:00 PM', desc: 'Traditional music and cuisine', icon: '🎭' },
+            ].map((event, i) => (
+              <motion.div key={event.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-transparent p-6 text-center hover:border-[#D4AF37]/20 transition-colors"
+              >
+                <span className="text-4xl mb-4 block">{event.icon}</span>
+                <h3 className="text-lg font-semibold text-white mb-1">{event.title}</h3>
+                <p className="text-[#D4AF37] text-sm font-medium">{event.date}</p>
+                <p className="text-white/40 text-xs mt-1">{event.time}</p>
+                <p className="text-white/50 text-sm mt-3">{event.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="relative px-4 py-32">
         <div className="absolute inset-0">
@@ -493,6 +527,7 @@ export default function LandingPage() {
                 <Link href="/menu" className="block hover:text-[#D4AF37] transition-colors">Our Menu</Link>
                 <a href="#how-it-works" className="block hover:text-[#D4AF37] transition-colors">How It Works</a>
                 <a href="#gallery" className="block hover:text-[#D4AF37] transition-colors">Gallery</a>
+                <a href="#events" className="block hover:text-[#D4AF37] transition-colors">Events</a>
               </div>
             </div>
             <div>
