@@ -22,8 +22,13 @@ export default function AdminTablesPage() {
   const [seedError, setSeedError] = useState('');
 
   const loadTables = async () => {
-    const data = await getRestaurantTables();
-    setTables(data);
+    setSeedError('');
+    try {
+      const data = await getRestaurantTables();
+      setTables(data);
+    } catch (e: any) {
+      setSeedError(e.message);
+    }
   };
 
   const handleSeed = async () => {
@@ -47,17 +52,7 @@ export default function AdminTablesPage() {
     checkAdminAuth().then(async (authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      try {
-        const existing = await getRestaurantTables();
-        if (existing.length === 0) {
-          await seedTables();
-          await loadTables();
-        } else {
-          setTables(existing);
-        }
-      } catch (e: any) {
-        setSeedError(e.message);
-      }
+      loadTables();
     });
   }, []);
 
@@ -97,7 +92,7 @@ export default function AdminTablesPage() {
         <h1 className="text-2xl font-bold text-white">Tables</h1>
         <button onClick={handleSeed} disabled={seeding}
           className="px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/60 text-sm font-medium hover:bg-white/[0.08] transition-all disabled:opacity-50 flex items-center gap-2">
-          {seeding ? 'Seeding...' : 'Reset 15 Tables'}
+          {seeding ? 'Creating...' : tables.length === 0 ? 'Create 15 Tables' : 'Reset 15 Tables'}
         </button>
       </div>
       {seedError && (
