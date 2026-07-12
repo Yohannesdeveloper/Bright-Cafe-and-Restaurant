@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowRight, Star, UtensilsCrossed, Coffee, Wine, Pizza, Cake, Search, ShoppingBag, Smartphone, Scan, CheckCircle, ChefHat, Clock, MapPin, Phone, Quote, Play, Camera, MessageCircle, QrCode } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import Link from 'next/link';
@@ -59,9 +59,8 @@ export default function LandingPage() {
   const [settings, setSettings] = useState<any>(null);
   const [featured, setFeatured] = useState<any[]>([]);
   const [loadingFeatured, setLoadingFeatured] = useState(true);
-  const { scrollYProgress } = useScroll();
-  const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const heroScale = 1;
+  const heroOpacity = 1;
 
   useEffect(() => {
     const cachedSettings = getCached<any>('settings');
@@ -115,15 +114,13 @@ export default function LandingPage() {
       {/* Floating Background Emojis */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         {floatingEmojis.map((emoji, i) => (
-          <motion.div
+          <div
             key={i}
             className="absolute text-4xl sm:text-6xl opacity-[0.04]"
             style={{ left: `${10 + i * 12}%`, top: `${15 + (i % 4) * 20}%` }}
-            animate={{ y: [0, -30, 0], rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 6 + i, repeat: Infinity, ease: 'easeInOut', delay: i * 0.8 }}
           >
             {emoji}
-          </motion.div>
+          </div>
         ))}
       </div>
 
