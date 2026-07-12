@@ -5,7 +5,7 @@ import { ArrowRight, Star, UtensilsCrossed, Coffee, Wine, Pizza, Cake, Search, S
 import { QRCodeSVG } from 'qrcode.react';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
-import { getRestaurantSettings, getMenuItems } from '@/lib/actions';
+import { getRestaurantSettings } from '@/lib/actions';
 import { getCached, setCache } from '@/lib/cache';
 import Image from 'next/image';
 
@@ -65,8 +65,19 @@ export default function LandingPage() {
   useEffect(() => {
     // Prefetch menu data so it's cached before user clicks
     fetch('/api/menu').then(r => r.json()).then(data => {
-      if (data?.length > 0) setCache('menuItems', data);
-    }).catch(() => {});
+      if (data?.length > 0) {
+        setCache('menuItems', data);
+        // also use for featured dishes
+        const food = data.filter(Boolean).filter((item: any) => !['Beverages & Drinks', 'Hot Drinks', 'Juice & Shakes', 'Soft Drinks'].includes(item.category));
+        const priority = ['Bright Special Double Beef Burger', 'Bright Special Burger', 'Beef Burger', 'Bright Special Pizza', 'Grilled Fish', 'Mixed Salad', 'Chicken Burger', 'Fish Cutlet', 'Club Sandwich'];
+        const byPriority = priority.map((n: string) => food.find((i: any) => i.name === n)).filter(Boolean);
+        const rest = food.filter((i: any) => !priority.includes(i.name));
+        const result = [...byPriority, ...rest].slice(0, 6);
+        setFeatured(result);
+        setCache('featured', result);
+      }
+      setLoadingFeatured(false);
+    }).catch(() => setLoadingFeatured(false));
 
     const cachedSettings = getCached<any>('settings');
     if (cachedSettings) setSettings(cachedSettings);
@@ -74,16 +85,7 @@ export default function LandingPage() {
 
     const cachedFeatured = getCached<any[]>('featured');
     if (cachedFeatured) { setFeatured(cachedFeatured); setLoadingFeatured(false); }
-    else getMenuItems().then(data => {
-      const food = data.filter(Boolean).filter(item => !['Beverages & Drinks', 'Hot Drinks', 'Juice & Shakes', 'Soft Drinks'].includes(item.category));
-      const priority = ['Bright Special Double Beef Burger', 'Bright Special Burger', 'Beef Burger', 'Bright Special Pizza', 'Grilled Fish', 'Mixed Salad', 'Chicken Burger', 'Fish Cutlet', 'Club Sandwich'];
-      const byPriority = priority.map(n => food.find(i => i.name === n)).filter(Boolean) as any[];
-      const rest = food.filter(i => !priority.includes(i.name));
-      const result = [...byPriority, ...rest].slice(0, 6);
-      setFeatured(result);
-      setCache('featured', result);
-      setLoadingFeatured(false);
-    }).catch(() => setLoadingFeatured(false));
+
   }, []);
 
   const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 50 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-80px' }, transition: { duration: 0.7, delay } });
