@@ -1,7 +1,8 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Star, UtensilsCrossed, Coffee, Wine, Pizza, Cake, Search, ShoppingBag, Smartphone, Scan, CheckCircle, ChefHat, Clock, MapPin, Phone, Quote, Play, Camera, MessageCircle } from 'lucide-react';
+import { ArrowRight, Star, UtensilsCrossed, Coffee, Wine, Pizza, Cake, Search, ShoppingBag, Smartphone, Scan, CheckCircle, ChefHat, Clock, MapPin, Phone, Quote, Play, Camera, MessageCircle, QrCode } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { getRestaurantSettings, getMenuItems } from '@/lib/actions';
@@ -373,6 +374,28 @@ export default function LandingPage() {
             </a>
           </div>
         </motion.div>
+      </section>
+
+      {/* QR Code Section */}
+      <section className="relative px-4 py-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 via-transparent to-[#D4AF37]/5" />
+        <div className="relative max-w-6xl mx-auto text-center">
+          <motion.div {...fadeUp(0)} className="mb-8">
+            <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Digital Menu</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Scan &amp; <span className="text-[#D4AF37]">Order</span></h2>
+            <p className="text-white/40 text-lg max-w-2xl mx-auto">Point your camera at the QR code below to browse our full menu and place your order directly from your phone.</p>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+            className="inline-flex items-center justify-center p-4 rounded-3xl bg-white shadow-2xl shadow-[#D4AF37]/10 border border-white/10"
+          >
+            <QRCodeSVG value="https://bright-cafe-and-restaurant.vercel.app/menu" size={280} level="H" includeMargin fgColor="#000000" bgColor="#ffffff" />
+          </motion.div>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.4 }}
+            className="mt-6 text-white/30 text-sm flex items-center justify-center gap-2"
+          >
+            <Smartphone className="w-4 h-4" /> No app download needed
+          </motion.p>
+        </div>
       </section>
 
       {/* Footer */}
