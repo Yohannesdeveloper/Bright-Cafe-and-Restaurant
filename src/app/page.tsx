@@ -56,6 +56,7 @@ function useInView(ref: React.RefObject<HTMLDivElement | null>) {
 export default function LandingPage() {
   const [settings, setSettings] = useState<any>(null);
   const [featured, setFeatured] = useState<any[]>([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
   const { scrollYProgress } = useScroll();
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
@@ -68,7 +69,8 @@ export default function LandingPage() {
       const byPriority = priority.map(n => food.find(i => i.name === n)).filter(Boolean) as any[];
       const rest = food.filter(i => !priority.includes(i.name));
       setFeatured([...byPriority, ...rest].slice(0, 6));
-    }).catch(() => {});
+      setLoadingFeatured(false);
+    }).catch(() => setLoadingFeatured(false));
   }, []);
 
   const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 50 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-80px' }, transition: { duration: 0.7, delay } });
@@ -193,7 +195,9 @@ export default function LandingPage() {
             <p className="text-white/40 text-lg max-w-2xl mx-auto">Hand-picked favorites from our master chefs</p>
           </motion.div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {featured.map((item, i) => (
+            {loadingFeatured ? Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="rounded-2xl overflow-hidden aspect-[3/4] bg-white/[0.03] animate-pulse" />
+            )) : featured.map((item, i) => (
               <motion.div key={item.id || item.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
                 whileHover={{ y: -8 }} className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
               >
