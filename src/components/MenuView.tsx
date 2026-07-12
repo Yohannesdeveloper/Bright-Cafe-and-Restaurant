@@ -6,13 +6,12 @@ import { ShoppingBag, Plus, Search, Globe, Camera, MessageCircle, Play, Phone, M
 import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
 import { getCached, setCache } from '@/lib/cache';
 import { supabase } from '@/lib/supabase';
 import { ThemeToggle } from './ThemeToggle';
 import { QRCodeSVG } from 'qrcode.react';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface CartItem {
   id: number;
@@ -40,40 +39,25 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
       const data = await getMenuItems();
       if (data.length > 0) { setMenuItems(data); setCache('menuItems', data); }
     } catch {}
-    // Background load images
-    try {
-      const { getMenuImages } = await import('@/lib/actions');
-      const images = await getMenuImages();
-      if (images.length > 0) {
-        const imgMap = Object.fromEntries(images.map((i: any) => [i.id, i.image]));
-        setMenuItems(prev => {
-          const merged = (prev ?? []).map((item: any) => ({ ...item, image: imgMap[item.id] || item.image }));
-          setCache('menuItems', merged);
-          return merged;
-        });
-      }
-    } catch {}
   }, []);
 
   useEffect(() => {
     setMounted(true);
-    // Initialize from cache or initial items after mount
     if (initialItems && initialItems.length > 0) {
       setMenuItems(initialItems);
+      setCache('menuItems', initialItems);
     } else {
       const cached = getCached<any[]>('menuItems');
       if (cached) setMenuItems(cached);
     }
-    // Set active category from URL
     const categoryFromUrl = searchParams.get('category');
     if (categoryFromUrl) setActiveCategory(categoryFromUrl);
-    // Refresh menu
     refreshMenu();
     const channel = supabase.channel('menu-items')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, refreshMenu)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [refreshMenu]);
+  }, [refreshMenu, initialItems, searchParams]);
 
   useEffect(() => {
     getRestaurantSettings().then(setSettings).catch(() => {});
@@ -82,10 +66,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
         getRestaurantSettings().then(setSettings).catch(() => {});
       })
       .subscribe();
-    const interval = setInterval(() => {
-      getRestaurantSettings().then(setSettings).catch(() => {});
-    }, 5000);
-    return () => { supabase.removeChannel(channel); clearInterval(interval); };
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const filteredItems = useMemo(() => (menuItems ?? []).filter(item => {
@@ -103,7 +84,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
     if (categoryNames.length > 0 && !activeCategory) {
       setActiveCategory(categoryNames[0]);
     }
-  }, [categoryNames]);
+  }, [categoryNames, activeCategory]);
 
   const handleItemClick = (item: any) => {
     setSelectedItem(item);
@@ -197,7 +178,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
         <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#050508]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/[0.04]">
           <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
             <div className="flex min-w-0 items-center gap-3">
-              <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="w-8 h-8 object-contain" />
+              <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={32} height={32} className="object-contain" priority />
               <span className="text-sm font-medium text-black/50 dark:text-white/50">
                 {tableNumber ? `Table ${tableNumber}` : 'Our Menu'}
               </span>
@@ -224,7 +205,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
         <div className="relative px-4 pb-8 pt-8 text-center">
           <div className="mx-auto max-w-7xl">
             <div className="inline-block p-1 rounded-full bg-gradient-to-r from-[#D4AF37]/30 to-transparent mb-6">
-              <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="h-20 w-auto mx-auto drop-shadow-2xl" />
+              <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={80} height={80} className="drop-shadow-2xl" priority />
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black dark:text-white">
               {settings?.name || 'Bright Cafe and Restaurant'}
@@ -325,16 +306,16 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
                         onClick={() => handleItemClick(item)}
                         className="h-full w-full cursor-zoom-in"
                       >
-                        <div className="h-full w-full">
+                        <div className="h-full w-full relative">
                           {item.image?.match(/^(https?|data):/) ? (
-                            <LazyLoadImage
+                            <Image
                               src={item.image}
                               alt={item.name}
-                              className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
-                              effect="blur"
-                              threshold={100}
-                              wrapperClassName="h-full w-full"
-                              decoding="async"
+                              fill
+                              sizes="(max-width: 640px) 8rem, 10rem"
+                              className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                              loading={ci === 0 && ii < 3 ? 'eager' : 'lazy'}
+                              priority={ci === 0 && ii < 3}
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-4xl">
@@ -415,7 +396,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
         <div className="mx-auto max-w-4xl px-4 py-16">
           {/* Logo + Brand */}
           <div className="text-center mb-10">
-            <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="h-20 w-auto mx-auto mb-4" />
+            <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={80} height={80} className="mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-black dark:text-white">{settings?.name || 'Bright Cafe and Restaurant'}</h3>
             {settings?.description && (
               <p className="text-sm text-black/50 dark:text-white/50 mt-1 max-w-md mx-auto">{settings.description}</p>

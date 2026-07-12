@@ -5,26 +5,29 @@ import { getCache as getRedisCache, setCache as setRedisCache, deleteCache } fro
 
 // Menu Items
 export async function getMenuItems() {
-  // Try Redis cache first
   const cached = await getRedisCache<any[]>('menuItems');
   if (cached) return cached;
 
-  // Fetch from database
-  const { data, error } = await supabase.from('menu_items').select('id,name,description,price,category,available,rating,created_at').order('id');
+  const { data, error } = await supabase.from('menu_items').select('id,name,description,price,category,image,available,rating,created_at').order('id');
   if (error) throw new Error(error.message);
   
   const items = data || [];
-  
-  // Cache in Redis for 5 minutes
   await setRedisCache('menuItems', items, 300);
   
   return items;
 }
 
 export async function getMenuImages() {
+  const cached = await getRedisCache<any[]>('menuImages');
+  if (cached) return cached;
+
   const { data, error } = await supabase.from('menu_items').select('id,image').order('id');
   if (error) throw new Error(error.message);
-  return data || [];
+  
+  const images = data || [];
+  await setRedisCache('menuImages', images, 600);
+  
+  return images;
 }
 
 export async function seedMenuItems(items: Record<string, unknown>[]) {
@@ -40,6 +43,7 @@ export async function addMenuItem(item: Record<string, unknown>) {
     
     // Invalidate cache
     await deleteCache('menuItems');
+    await deleteCache('menuImages');
     
     return { success: true, data: data?.[0] || data };
   } catch (e) {
@@ -57,12 +61,14 @@ export async function updateMenuItem(id: number, item: Record<string, unknown>) 
       
       // Invalidate cache
       await deleteCache('menuItems');
+      await deleteCache('menuImages');
       
       return { success: true, data: inserted?.[0] || inserted };
     }
     
     // Invalidate cache
     await deleteCache('menuItems');
+    await deleteCache('menuImages');
     
     return { success: true, data: data[0] };
   } catch (e) {
@@ -76,6 +82,7 @@ export async function deleteMenuItem(id: number) {
   
   // Invalidate cache
   await deleteCache('menuItems');
+  await deleteCache('menuImages');
 }
 
 // Orders

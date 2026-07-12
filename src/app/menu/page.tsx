@@ -1,12 +1,19 @@
-import dynamic from 'next/dynamic';
+import { getMenuItems } from '@/lib/actions';
 import { Suspense } from 'react';
+import { MenuView } from '@/components/MenuView';
 
-const MenuView = dynamic(() => import('@/components/MenuView').then(m => ({ default: m.MenuView })));
+export const dynamic = 'force-dynamic';
 
-export default function MenuPage() {
+export default async function MenuPage({ searchParams }: { searchParams: Promise<{ table?: string; category?: string }> }) {
+  const params = await searchParams;
+  let initialItems: any[] = [];
+  try {
+    initialItems = await getMenuItems();
+  } catch {}
+
   return (
     <Suspense fallback={null}>
-      <MenuView />
+      <MenuView tableNumber={params.table} initialItems={initialItems} />
     </Suspense>
   );
 }

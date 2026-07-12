@@ -7,8 +7,7 @@ import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { getRestaurantSettings, getMenuItems } from '@/lib/actions';
 import { getCached, setCache } from '@/lib/cache';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import Image from 'next/image';
 
 const IMG = {
   food1: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80',
@@ -132,7 +131,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050508]/80 backdrop-blur-xl border-b border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <img src="/PNG-01.png" alt="Bright Cafe" className="h-9 w-auto" />
+            <Image src="/PNG-01.png" alt="Bright Cafe" width={36} height={36} className="w-auto h-9" priority />
           </div>
           <div className="flex items-center gap-6">
             <Link href="/menu" className="text-sm text-white/60 hover:text-white transition-colors">Menu</Link>
@@ -162,7 +161,7 @@ export default function LandingPage() {
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <img src="/PNG-01.png" alt="Logo" className="h-28 sm:h-32 w-auto mx-auto mb-6 drop-shadow-2xl" />
+            <Image src="/PNG-01.png" alt="Logo" width={128} height={128} className="h-28 sm:h-32 w-auto mx-auto mb-6 drop-shadow-2xl" priority />
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.15 }} className="text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tight mb-4">
             <span className="text-white">Bright</span>{' '}
@@ -214,13 +213,14 @@ export default function LandingPage() {
                 whileHover={{ y: -8 }} className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
               >
                 <Link href="/menu">
-                  <LazyLoadImage
+                  <Image
                     src={item.image}
                     alt={item.name}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    effect="blur"
-                    threshold={100}
-                    decoding="async"
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    loading={i < 3 ? 'eager' : 'lazy'}
+                    priority={i < 3}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-[#050508]/30 to-transparent" />
                   <div className="absolute top-3 left-3">
@@ -366,7 +366,7 @@ export default function LandingPage() {
             className="relative rounded-3xl overflow-hidden border border-white/[0.06] group"
           >
             <div className="aspect-[21/9] sm:aspect-[3/1]">
-              <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1200&q=80" alt="Piano Night" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" />
+              <Image src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1200&q=80" alt="Piano Night" fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="100vw" />
             </div>
             <div className="absolute inset-0 bg-gradient-to-r from-[#050508]/95 via-[#050508]/70 to-transparent" />
             <div className="absolute inset-0 flex items-center">
@@ -407,13 +407,14 @@ export default function LandingPage() {
                 className={`relative overflow-hidden rounded-2xl ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
               >
                 <div className={`${i === 0 ? 'aspect-[4/5] md:aspect-auto md:h-full' : 'aspect-[4/3]'}`}>
-                  <LazyLoadImage
+                  <Image
                     src={img}
                     alt="Restaurant"
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                    effect="blur"
-                    threshold={100}
-                    decoding="async"
+                    fill
+                    sizes={i === 0 ? '(max-width: 768px) 50vw, 50vw' : '(max-width: 768px) 50vw, 25vw'}
+                    className="object-cover hover:scale-110 transition-transform duration-700"
+                    loading={i < 2 ? 'eager' : 'lazy'}
+                    priority={i < 2}
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
@@ -533,7 +534,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="w-9 h-9 object-contain" />
+                <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={36} height={36} className="object-contain" />
                 <span className="font-semibold">Bright Cafe &amp; Restaurant</span>
               </div>
               <p className="text-white/40 text-sm max-w-md">Make Your Day Bright</p>
