@@ -4,8 +4,9 @@ import { FoodModal } from '@/components/FoodModal';
 import { Cart } from '@/components/Cart';
 import { ShoppingBag, Plus, Search, Globe, Camera, MessageCircle, Play, Phone, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
+import { getCached, setCache } from '@/lib/cache';
 import { supabase } from '@/lib/supabase';
 import { ThemeToggle } from './ThemeToggle';
 import { QRCodeSVG } from 'qrcode.react';
@@ -32,8 +33,10 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
 
   const fetchAndMergeMenu = useCallback(async () => {
     try {
+      const cached = getCached<any[]>('menuItems');
+      if (cached) { setMenuItems(cached); return; }
       const data = await getMenuItems();
-      if (data.length > 0) setMenuItems(data);
+      if (data.length > 0) { setMenuItems(data); setCache('menuItems', data); }
     } catch {}
   }, []);
 
@@ -47,13 +50,15 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   }, [fetchAndMergeMenu]);
 
   useEffect(() => {
-    getRestaurantSettings().then(setSettings).catch(() => {});
+    const cached = getCached<any>('settings');
+    if (cached) setSettings(cached);
+    else getRestaurantSettings().then(d => { setSettings(d); setCache('settings', d); }).catch(() => {});
   }, []);
 
-  const filteredItems = menuItems.filter(item => {
+  const filteredItems = useMemo(() => menuItems.filter(item => {
     const q = searchQuery.toLowerCase();
     return !q || item.name.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q);
-  });
+  }), [menuItems, searchQuery]);
   const groupedItems: Record<string, any[]> = {};
   filteredItems.forEach(item => {
     if (!groupedItems[item.category]) groupedItems[item.category] = [];
@@ -169,7 +174,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
         <div className="relative px-4 pb-8 pt-8 text-center">
           <div className="mx-auto max-w-7xl">
             <div className="inline-block p-1 rounded-full bg-gradient-to-r from-[#D4AF37]/30 to-transparent mb-6">
-              <img src="/PNG-01.png" alt="Logo" className="h-20 w-auto mx-auto drop-shadow-2xl" />
+              <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="h-20 w-auto mx-auto drop-shadow-2xl" />
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black dark:text-white">
               {settings?.name || 'Bright Cafe and Restaurant'}
@@ -341,12 +346,21 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
       {/* Footer */}
       <footer className="border-t border-black/10 dark:border-white/10">
         <div className="mx-auto max-w-7xl px-4 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* QR Code */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Brand */}
+            <div className="text-center md:text-left md:col-span-1">
+              <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="h-12 w-auto mx-auto md:mx-0 mb-3" />
+              <h3 className="text-sm font-semibold text-black dark:text-white">{settings?.name || 'Bright Cafe and Restaurant'}</h3>
+              {settings?.description && (
+                <p className="text-xs text-black/50 dark:text-white/50 mt-1">{settings.description}</p>
+              )}
+            </div>
+
+            {/* Quick Links */}
             <div className="text-center md:text-left">
               <h3 className="text-sm font-semibold text-black dark:text-white mb-3">Scan to Order</h3>
-              <div className="inline-flex items-center justify-center w-40 h-40 rounded-2xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 p-2">
-                <QRCodeSVG value="https://bright-cafe-and-restaurant.vercel.app/menu" size={160} level="H" includeMargin fgColor="#000000" bgColor="#ffffff" className="w-full h-full" />
+              <div className="inline-flex items-center justify-center w-32 h-32 rounded-2xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 p-2">
+                <QRCodeSVG value="https://bright-cafe-and-restaurant.vercel.app/menu" size={120} level="H" includeMargin fgColor="#000000" bgColor="#ffffff" className="w-full h-full" />
               </div>
             </div>
 

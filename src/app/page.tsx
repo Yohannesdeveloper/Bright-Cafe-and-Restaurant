@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { getRestaurantSettings, getMenuItems } from '@/lib/actions';
+import { getCached, setCache } from '@/lib/cache';
 
 const IMG = {
   food1: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80',
@@ -62,18 +63,26 @@ export default function LandingPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   useEffect(() => {
-    getRestaurantSettings().then(setSettings).catch(() => {});
-    getMenuItems().then(data => {
+    const cachedSettings = getCached<any>('settings');
+    if (cachedSettings) setSettings(cachedSettings);
+    else getRestaurantSettings().then(d => { setSettings(d); setCache('settings', d); }).catch(() => {});
+
+    const cachedFeatured = getCached<any[]>('featured');
+    if (cachedFeatured) { setFeatured(cachedFeatured); setLoadingFeatured(false); }
+    else getMenuItems().then(data => {
       const food = data.filter(Boolean).filter(item => !['Beverages & Drinks', 'Hot Drinks', 'Juice & Shakes', 'Soft Drinks'].includes(item.category));
       const priority = ['Bright Special Double Beef Burger', 'Bright Special Burger', 'Beef Burger', 'Bright Special Pizza', 'Grilled Fish', 'Mixed Salad', 'Chicken Burger', 'Fish Cutlet', 'Club Sandwich'];
       const byPriority = priority.map(n => food.find(i => i.name === n)).filter(Boolean) as any[];
       const rest = food.filter(i => !priority.includes(i.name));
-      setFeatured([...byPriority, ...rest].slice(0, 6));
+      const result = [...byPriority, ...rest].slice(0, 6);
+      setFeatured(result);
+      setCache('featured', result);
       setLoadingFeatured(false);
     }).catch(() => setLoadingFeatured(false));
   }, []);
 
   const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 50 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-80px' }, transition: { duration: 0.7, delay } });
+  const sectionHeaderClass = (delay: number) => `animate-fade-in-up anim-delay-${delay}`;
 
   const categories = [
     { icon: Coffee, label: 'Hot Drinks', color: 'from-amber-500/20 to-amber-600/10', emoji: '☕' },
@@ -189,11 +198,11 @@ export default function LandingPage() {
       {/* Featured Dishes */}
       <section className="relative px-4 py-24">
         <div className="max-w-7xl mx-auto">
-          <motion.div {...fadeUp(0)} className="text-center mb-14">
+          <div className={`text-center mb-14 ${sectionHeaderClass(0)}`}>
             <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Premium Selection</span>
             <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Featured <span className="text-[#D4AF37]">Dishes</span></h2>
             <p className="text-white/40 text-lg max-w-2xl mx-auto">Hand-picked favorites from our master chefs</p>
-          </motion.div>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {loadingFeatured ? Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="rounded-2xl overflow-hidden aspect-[3/4] bg-white/[0.03] animate-pulse" />
@@ -202,7 +211,7 @@ export default function LandingPage() {
                 whileHover={{ y: -8 }} className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
               >
                 <Link href="/menu">
-                  <img src={item.image} alt={item.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <img src={item.image} alt={item.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-[#050508]/30 to-transparent" />
                   <div className="absolute top-3 left-3">
                     <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white/80">{item.category}</span>
@@ -222,18 +231,16 @@ export default function LandingPage() {
       <section id="how-it-works" className="relative px-4 py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/3 via-transparent to-[#D4AF37]/3" />
         <div className="relative max-w-6xl mx-auto">
-          <motion.div {...fadeUp(0)} className="text-center mb-16">
+          <div className={`text-center mb-16 ${sectionHeaderClass(0)}`}>
             <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Simple Process</span>
             <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">How It <span className="text-[#D4AF37]">Works</span></h2>
             <p className="text-white/40 text-lg">From your table to your plate in four easy steps</p>
-          </motion.div>
+          </div>
           <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Connection lines */}
             <div className="absolute top-20 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-[#D4AF37]/40 via-[#D4AF37]/20 to-transparent hidden lg:block" />
             {steps.map((step, i) => (
-              <motion.div key={step.title} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                className="relative flex flex-col items-center text-center"
-              >
+              <div key={step.title} className={`relative flex flex-col items-center text-center animate-fade-in-up anim-delay-${i + 1}`}>
                 <div className={`relative w-20 h-20 rounded-2xl bg-gradient-to-br ${step.color} p-0.5 mb-6 shadow-lg`}>
                   <div className="w-full h-full rounded-2xl bg-[#050508] flex items-center justify-center">
                     <step.icon className="w-8 h-8 text-[#D4AF37]" />
@@ -244,7 +251,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
                 <p className="text-white/40 text-sm max-w-xs">{step.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -278,11 +285,11 @@ export default function LandingPage() {
       {/* Categories Preview */}
       <section className="relative px-4 py-20">
         <div className="max-w-6xl mx-auto">
-          <motion.div {...fadeUp(0)} className="text-center mb-14">
+          <div className={`text-center mb-14 ${sectionHeaderClass(0)}`}>
             <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Browse by</span>
             <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Explore <span className="text-[#D4AF37]">Categories</span></h2>
             <p className="text-white/40 text-lg">From traditional Ethiopian dishes to international favorites</p>
-          </motion.div>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.map((cat, i) => (
               <motion.div key={cat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
@@ -310,10 +317,10 @@ export default function LandingPage() {
       <section className="relative px-4 py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/3 via-transparent to-transparent" />
         <div className="relative max-w-6xl mx-auto">
-          <motion.div {...fadeUp(0)} className="text-center mb-14">
+          <div className={`text-center mb-14 ${sectionHeaderClass(0)}`}>
             <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Testimonials</span>
             <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">What Our <span className="text-[#D4AF37]">Guests Say</span></h2>
-          </motion.div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {testimonials.map((t, i) => (
               <motion.div key={t.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
@@ -339,18 +346,18 @@ export default function LandingPage() {
       {/* Gallery */}
       <section id="gallery" className="relative px-4 py-24">
         <div className="max-w-7xl mx-auto">
-          <motion.div {...fadeUp(0)} className="text-center mb-14">
+          <div className={`text-center mb-14 ${sectionHeaderClass(0)}`}>
             <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Ambiance</span>
             <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Our <span className="text-[#D4AF37]">Restaurant</span></h2>
             <p className="text-white/40 text-lg">Experience the atmosphere before you arrive</p>
-          </motion.div>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {['/image%201.webp', '/image%202.webp', '/image%203.webp', '/Traditional%20coffee.jpg'].map((img, i) => (
               <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 className={`relative overflow-hidden rounded-2xl ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
               >
                 <div className={`${i === 0 ? 'aspect-[4/5] md:aspect-auto md:h-full' : 'aspect-[4/3]'}`}>
-                  <img src={img} alt="Restaurant" className="w-full h-full object-cover hover:scale-110 transition-transform duration-700" />
+                  <img src={img} alt="Restaurant" className="w-full h-full object-cover hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async" />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               </motion.div>
@@ -387,11 +394,11 @@ export default function LandingPage() {
       <section className="relative px-4 py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 via-transparent to-[#D4AF37]/5" />
         <div className="relative max-w-6xl mx-auto text-center">
-          <motion.div {...fadeUp(0)} className="mb-8">
+          <div className={`mb-8 ${sectionHeaderClass(0)}`}>
             <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Digital Menu</span>
             <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Scan &amp; <span className="text-[#D4AF37]">Order</span></h2>
             <p className="text-white/40 text-lg max-w-2xl mx-auto">Point your camera at the QR code below to browse our full menu and place your order directly from your phone.</p>
-          </motion.div>
+          </div>
           <motion.div initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
             className="inline-flex items-center justify-center p-4 rounded-3xl bg-white shadow-2xl shadow-[#D4AF37]/10 border border-white/10"
           >
