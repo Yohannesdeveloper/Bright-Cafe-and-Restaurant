@@ -8,6 +8,11 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
+
+function cachedImageSrc(src: string) {
+  if (!src?.match(/^https?:/)) return src;
+  return `/api/image-cache?url=${encodeURIComponent(src)}`;
+}
 import { getCached, setCache } from '@/lib/cache';
 import { supabase } from '@/lib/supabase';
 import { ThemeToggle } from './ThemeToggle';
@@ -309,7 +314,7 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
                         <div className="h-full w-full relative">
                           {item.image?.match(/^(https?|data):/) ? (
                             <Image
-                              src={item.image}
+                              src={cachedImageSrc(item.image)}
                               alt={item.name}
                               fill
                               sizes="(max-width: 640px) 8rem, 10rem"

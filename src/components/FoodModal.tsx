@@ -4,6 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, Star, Heart } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { useState } from 'react';
+import Image from 'next/image';
+
+function cachedImageSrc(src: string) {
+  if (!src?.match(/^https?:/)) return src;
+  return `/api/image-cache?url=${encodeURIComponent(src)}`;
+}
 
 interface FoodModalProps {
   item: {
@@ -80,7 +86,9 @@ export function FoodModal({ item, isOpen, onClose, onAddToCart }: FoodModalProps
 
                 <div className="relative">
                   {item.image?.match(/^(https?|data):/) ? (
-                    <img src={item.image} alt={item.name} className="w-full h-64 object-cover" loading="lazy" decoding="async" />
+                    <div className="relative w-full h-64">
+                      <Image src={cachedImageSrc(item.image)} alt={item.name} fill className="object-cover" />
+                    </div>
                   ) : (
                     <div className="flex w-full h-64 items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-6xl">
                       {item.image}
