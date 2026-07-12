@@ -427,8 +427,9 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-transparent p-6 text-center hover:border-[#D4AF37]/20 transition-colors"
+                className="rounded-2xl border border-white/[0.06] bg-gradient-to-br from-white/[0.04] to-transparent p-6 text-center hover:border-[#D4AF37]/20 transition-colors relative"
               >
+                <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-medium">Reservations Open</span>
                 <span className="text-4xl mb-4 block">{event.icon}</span>
                 <h3 className="text-lg font-semibold text-white mb-1">{event.title}</h3>
                 <p className="text-[#D4AF37] text-sm font-medium">{event.date}</p>
