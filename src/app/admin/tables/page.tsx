@@ -2,7 +2,6 @@
 
 import { TableManagement } from '@/components/TableManagement';
 import { useEffect, useState } from 'react';
-import { checkAdminAuth } from '@/lib/admin-auth';
 import { getRestaurantTables, addRestaurantTable, updateRestaurantTable, deleteRestaurantTable } from '@/lib/actions';
 
 const seedTables = async () => {
@@ -17,7 +16,6 @@ const seedTables = async () => {
 
 export default function AdminTablesPage() {
   const [tables, setTables] = useState<any[]>([]);
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [seeding, setSeeding] = useState(false);
   const [seedError, setSeedError] = useState('');
 
@@ -49,11 +47,8 @@ export default function AdminTablesPage() {
   };
 
   useEffect(() => {
-    checkAdminAuth().then(async (authed) => {
-      if (!authed) { window.location.href = '/admin/login'; return; }
-      setAuthorized(true);
-      loadTables();
-    });
+    // Auth guaranteed by middleware — fetch immediately
+    loadTables();
   }, []);
 
   const handleAdd = async (table: any) => {
@@ -73,18 +68,6 @@ export default function AdminTablesPage() {
   const mappedTables = tables.map((t: any) => ({
     id: t.id, number: t.number, capacity: t.capacity, location: t.location, qrCode: t.qr_code, status: t.status,
   }));
-
-  if (authorized === null) {
-    return (
-      <div className="min-h-screen bg-[#050508] flex items-center justify-center">
-        <div className="relative">
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/10 rounded-full absolute inset-0 animate-ping opacity-30" />
-        </div>
-      </div>
-    );
-  }
-  if (!authorized) return null;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">

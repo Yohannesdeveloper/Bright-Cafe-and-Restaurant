@@ -2,19 +2,14 @@
 
 import { InventoryManagement } from '@/components/InventoryManagement';
 import { useEffect, useState } from 'react';
-import { checkAdminAuth } from '@/lib/admin-auth';
 import { getInventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } from '@/lib/actions';
 
 export default function AdminInventoryPage() {
   const [items, setItems] = useState<any[]>([]);
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    checkAdminAuth().then((authed) => {
-      if (!authed) { window.location.href = '/admin/login'; return; }
-      setAuthorized(true);
-      getInventory().then(setItems).catch(console.error);
-    });
+    // Auth guaranteed by middleware — fetch immediately
+    getInventory().then(setItems).catch(console.error);
   }, []);
 
   const handleAdd = async (item: any) => {
@@ -39,18 +34,6 @@ export default function AdminInventoryPage() {
     id: i.id, name: i.name, category: i.category, quantity: i.quantity,
     unit: i.unit, minThreshold: i.min_threshold, cost: i.cost, lastRestocked: i.last_restocked,
   }));
-
-  if (authorized === null) {
-    return (
-      <div className="min-h-screen bg-[#050508] flex items-center justify-center">
-        <div className="relative">
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/10 rounded-full absolute inset-0 animate-ping opacity-30" />
-        </div>
-      </div>
-    );
-  }
-  if (!authorized) return null;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">

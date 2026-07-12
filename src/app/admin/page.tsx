@@ -9,15 +9,11 @@ import {
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { getMenuItems, getOrders } from '@/lib/actions';
-import { checkAdminAuth } from '@/lib/admin-auth';
+import { getCached, setCache } from '@/lib/cache';
 import { cn } from '@/lib/utils';
 
-const statCards = [
-  { label: 'Total Revenue', icon: DollarSign, color: 'from-emerald-500/20 to-emerald-600/10', border: 'border-emerald-500/20', textColor: 'text-emerald-400', prefix: 'ETB ' },
-  { label: 'Total Orders', icon: ShoppingCart, color: 'from-blue-500/20 to-blue-600/10', border: 'border-blue-500/20', textColor: 'text-blue-400' },
-  { label: 'Menu Items', icon: Utensils, color: 'from-amber-500/20 to-amber-600/10', border: 'border-amber-500/20', textColor: 'text-amber-400' },
-  { label: 'Avg Rating', icon: Star, color: 'from-purple-500/20 to-purple-600/10', border: 'border-purple-500/20', textColor: 'text-purple-400' },
-];
+const MENU_CACHE = 'admin_menu_items_v2';
+const ORDERS_CACHE = 'admin_orders';
 
 const quickActions = [
   { label: 'Menu', href: '/admin/menu', icon: Utensils, desc: 'Manage dishes & categories', color: 'from-amber-500/10 to-amber-600/5', border: 'border-amber-500/20', iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400' },
@@ -29,17 +25,16 @@ const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { st
 const itemAnim = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 export default function AdminDashboard() {
-  const [menuItems, setMenuItems] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
+  // Load from cache immediately — no loading state
+  const [menuItems, setMenuItems] = useState<any[]>(() => getCached<any[]>(MENU_CACHE) ?? []);
+  const [orders, setOrders] = useState<any[]>(() => getCached<any[]>(ORDERS_CACHE) ?? []);
 
   useEffect(() => {
-    checkAdminAuth().then((authed) => {
-      if (!authed) { window.location.href = '/admin/login'; return; }
-      setAuthorized(true);
-      getMenuItems().then(setMenuItems).catch(() => {});
-      getOrders().then(setOrders).catch(() => {});
-    });
+    // Auth guaranteed by middleware — fetch both in parallel
+    Promise.all([
+      getMenuItems().then(data => { setMenuItems(data); setCache(MENU_CACHE, data); }).catch(() => {}),
+      getOrders().then(data => { setOrders(data); setCache(ORDERS_CACHE, data); }).catch(() => {}),
+    ]);
   }, []);
 
   const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
@@ -48,21 +43,7 @@ export default function AdminDashboard() {
     : '0.0';
 
   const recentOrders = orders.slice(0, 5);
-
   const topDishes = [...menuItems].sort((a, b) => b.rating - a.rating).slice(0, 5);
-
-  if (authorized === null) {
-    return (
-      <div className="min-h-screen bg-[#050508] flex items-center justify-center">
-        <div className="relative">
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/10 rounded-full absolute inset-0 animate-ping opacity-30" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!authorized) return null;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
