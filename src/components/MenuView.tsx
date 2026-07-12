@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
+import { getRestaurantSettings, createOrder } from '@/lib/actions';
 
 import { getCached, setCache } from '@/lib/cache';
 import { supabase } from '@/lib/supabase';
@@ -23,7 +23,7 @@ interface CartItem {
   image: string;
 }
 
-export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; initialItems?: any[] }) {
+export function MenuView({ tableNumber }: { tableNumber?: string }) {
   const searchParams = useSearchParams();
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,28 +37,31 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
 
   const refreshMenu = useCallback(async () => {
     try {
-      const data = await getMenuItems();
+      const res = await fetch('/api/menu');
+      const data = await res.json();
       if (data.length > 0) { setMenuItems(data); setCache('menuItems', data); }
     } catch {}
   }, []);
 
   useEffect(() => {
     setMounted(true);
-    if (initialItems && initialItems.length > 0) {
-      setMenuItems(initialItems);
-      setCache('menuItems', initialItems);
-    } else {
-      const cached = getCached<any[]>('menuItems');
-      if (cached) setMenuItems(cached);
-    }
     const categoryFromUrl = searchParams.get('category');
     if (categoryFromUrl) setActiveCategory(categoryFromUrl);
-    refreshMenu();
+
+    const cached = getCached<any[]>('menuItems');
+    if (cached && cached.length > 0) {
+      setMenuItems(cached);
+      // refresh in background without blocking render
+      setTimeout(refreshMenu, 2000);
+    } else {
+      refreshMenu();
+    }
+
     const channel = supabase.channel('menu-items')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, refreshMenu)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [refreshMenu, initialItems, searchParams]);
+  }, [refreshMenu, searchParams]);
 
   useEffect(() => {
     getRestaurantSettings().then(setSettings).catch(() => {});
