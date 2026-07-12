@@ -369,8 +369,8 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
             <div className="text-center md:text-left">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-black/40 dark:text-white/40 mb-4">Contact</h4>
               <div className="space-y-3 text-sm text-black/60 dark:text-white/60">
-                <a href={`tel:${settings?.phone || '+251-XXX-XXXXXX'}`} className="flex items-center justify-center md:justify-start gap-3 hover:text-[#D4AF37] transition-colors">
-                  <Phone className="h-4 w-4 shrink-0" /> {settings?.phone || '+251-XXX-XXXXXX'}
+                <a href={`tel:${settings?.phone || '+251911224765'}`} className="flex items-center justify-center md:justify-start gap-3 hover:text-[#D4AF37] transition-colors">
+                  <Phone className="h-4 w-4 shrink-0" /> {settings?.phone || '+251911224765'}
                 </a>
                 <a href={`https://maps.google.com/?q=${encodeURIComponent(settings?.address || 'Bright cafe & restaurant')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center md:justify-start gap-3 hover:text-[#D4AF37] transition-colors">
                   <MapPin className="h-4 w-4 shrink-0" /> {settings?.address || 'Bright cafe & restaurant'}

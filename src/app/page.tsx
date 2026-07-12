@@ -383,7 +383,7 @@ export default function LandingPage() {
                 View Full Menu <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </span>
             </Link>
-            <a href={`tel:${settings?.phone || '+251-XXX-XXXXXX'}`} className="flex items-center gap-2 px-8 py-5 border border-white/20 text-white/80 font-medium text-lg rounded-full hover:bg-white/5 hover:border-white/30 transition-all duration-300">
+            <a href={`tel:${settings?.phone || '+251911224765'}`} className="flex items-center gap-2 px-8 py-5 border border-white/20 text-white/80 font-medium text-lg rounded-full hover:bg-white/5 hover:border-white/30 transition-all duration-300">
               <Phone className="w-5 h-5" /> Call to Reserve
             </a>
           </div>
@@ -442,9 +442,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/30 flex items-center justify-center">
-                  <span className="text-[#D4AF37] text-sm font-bold">B</span>
-                </div>
+                <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="w-9 h-9 object-contain" />
                 <span className="font-semibold">Bright Cafe &amp; Restaurant</span>
               </div>
               <p className="text-white/40 text-sm max-w-md">Experience premium dining with our digital menu system. Fresh ingredients, authentic recipes, unforgettable taste.</p>
@@ -460,8 +458,8 @@ export default function LandingPage() {
             <div>
               <h4 className="text-sm font-semibold text-white mb-4">Contact</h4>
               <div className="space-y-2 text-sm text-white/40">
-                <a href={`tel:${settings?.phone || '+251-XXX-XXXXXX'}`} className="flex items-center gap-2 hover:text-[#D4AF37] transition-colors">
-                  <Phone className="w-3.5 h-3.5" /> {settings?.phone || '+251-XXX-XXXXXX'}
+                <a href={`tel:${settings?.phone || '+251911224765'}`} className="flex items-center gap-2 hover:text-[#D4AF37] transition-colors">
+                  <Phone className="w-3.5 h-3.5" /> {settings?.phone || '+251911224765'}
                 </a>
                 <a href={`https://maps.google.com/?q=${encodeURIComponent(settings?.address || 'Bright cafe & restaurant')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#D4AF37] transition-colors">
                   <MapPin className="w-3.5 h-3.5" /> Find us on Maps
