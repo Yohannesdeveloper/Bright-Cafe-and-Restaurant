@@ -63,8 +63,11 @@ export default function LandingPage() {
   useEffect(() => {
     getRestaurantSettings().then(setSettings).catch(() => {});
     getMenuItems().then(data => {
-      const drinkCats = ['Beverages & Drinks', 'Hot Drinks', 'Juice & Shakes', 'Soft Drinks'];
-      setFeatured(data.filter(Boolean).filter(item => !drinkCats.includes(item.category)).slice(0, 6));
+      const food = data.filter(Boolean).filter(item => !['Beverages & Drinks', 'Hot Drinks', 'Juice & Shakes', 'Soft Drinks'].includes(item.category));
+      const priority = ['Bright Special Double Beef Burger', 'Bright Special Burger', 'Beef Burger', 'Bright Special Pizza', 'Grilled Fish', 'Mixed Salad', 'Chicken Burger', 'Fish Cutlet', 'Club Sandwich'];
+      const byPriority = priority.map(n => food.find(i => i.name === n)).filter(Boolean) as any[];
+      const rest = food.filter(i => !priority.includes(i.name));
+      setFeatured([...byPriority, ...rest].slice(0, 6));
     }).catch(() => {});
   }, []);
 
