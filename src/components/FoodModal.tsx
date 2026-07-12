@@ -6,11 +6,6 @@ import { GlassCard } from './GlassCard';
 import { useState } from 'react';
 import Image from 'next/image';
 
-function cachedImageSrc(src: string) {
-  if (!src?.match(/^https?:/)) return src;
-  return `/api/image-cache?url=${encodeURIComponent(src)}`;
-}
-
 interface FoodModalProps {
   item: {
     id: number;
@@ -88,7 +83,7 @@ export function FoodModal({ item, isOpen, onClose, onAddToCart }: FoodModalProps
                 <div className="relative">
                   {item.image?.match(/^(https?|data):/) ? (
                     <div className="relative w-full h-64">
-                      <Image src={cachedImageSrc(item.image)} alt={item.name} fill className="object-cover" />
+                      <Image src={item.image} alt={item.name} fill className="object-cover" />
                     </div>
                   ) : (
                     <div className="flex w-full h-64 items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-6xl">
