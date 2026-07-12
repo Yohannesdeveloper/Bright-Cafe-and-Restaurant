@@ -154,9 +154,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
         <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#050508]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/[0.04]">
           <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/20 flex items-center justify-center">
-                <span className="text-[#D4AF37] text-xs font-bold">B</span>
-              </div>
+              <img src={settings?.logo || '/PNG-01.png'} alt="Logo" className="w-8 h-8 object-contain" />
               <span className="text-sm font-medium text-black/50 dark:text-white/50">
                 {tableNumber ? `Table ${tableNumber}` : 'Our Menu'}
               </span>
