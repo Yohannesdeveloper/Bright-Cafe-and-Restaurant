@@ -412,6 +412,30 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Map */}
+      <section className="relative px-4 py-20">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className={`text-center mb-12 ${sectionHeaderClass(0)}`}>
+            <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Visit Us</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Find <span className="text-[#D4AF37]">Us</span></h2>
+            <p className="text-white/40 text-lg">{settings?.address || 'Bright cafe & restaurant'}</p>
+          </div>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+            className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl border border-white/[0.06]"
+          >
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7880.6!2d38.7605919!3d9.0023799!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b8535b71f7ba3%3A0x5c30ef01f521d0bb!2sBright%20cafe%20%26%20restaurant!5e0!3m2!1sen!2set!4v1"
+              className="w-full h-[400px]"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Bright cafe & restaurant location"
+            />
+          </motion.div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer id="contact" className="border-t border-white/[0.06] px-4 py-12">
         <div className="max-w-6xl mx-auto">
