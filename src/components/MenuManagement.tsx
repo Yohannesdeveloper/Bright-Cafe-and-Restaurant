@@ -168,7 +168,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
               >
                 {/* Image */}
                 <div className="relative h-40 overflow-hidden">
-                  {item.image?.match(/^(https?|data):/) ? (
+                  {item.image?.match(/^(https?:|data:|\/api\/)/) ? (
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" fetchPriority="low" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
@@ -241,7 +241,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
               >
                 <div className="col-span-4 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/[0.04] shrink-0">
-                    {item.image?.match(/^(https?|data):/) ? (
+                  {item.image?.match(/^(https?:|data:|\/api\/)/) ? (
                       <img src={item.image} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -330,10 +330,12 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                   const url = data.get('image') as string;
                   const available = data.get('available') === 'on';
                   const image = url || uploadedImage;
-                  if (!image) { alert('Please provide an image URL or upload one.'); return; }
                   if (editingItem) {
-                    onEdit(editingItem.id, { name, description, price, category, image, available });
+                    const payload: Record<string, unknown> = { name, description, price, category, available };
+                    if (image) payload.image = image;
+                    onEdit(editingItem.id, payload);
                   } else {
+                    if (!image) { alert('Please provide an image URL or upload one.'); return; }
                     onAdd({ name, description, price, category, image, available } as Omit<FoodItem, 'id'>);
                   }
                   setIsModalOpen(false);

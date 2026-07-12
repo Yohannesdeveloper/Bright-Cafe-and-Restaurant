@@ -87,6 +87,8 @@ export function FoodModal({ item, isOpen, onClose, onAddToCart }: FoodModalProps
                     <div className="relative w-full h-64">
                       <Image src={item.image} alt={item.name} fill className="object-cover" />
                     </div>
+                  ) : item.image?.match(/^\/api\//) ? (
+                    <img src={item.image} alt={item.name} className="w-full h-64 object-cover" loading="eager" decoding="async" />
                   ) : (
                     <div className="flex w-full h-64 items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-6xl">
                       {item.image}

@@ -329,6 +329,14 @@ export function MenuView({
                               loading={ci === 0 && ii < 3 ? 'eager' : 'lazy'}
                               priority={ci === 0 && ii < 3}
                             />
+                          ) : item.image?.match(/^\/api\//) ? (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                              loading={ci === 0 && ii < 3 ? 'eager' : 'lazy'}
+                              decoding="async"
+                            />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-4xl">
                               {item.image}

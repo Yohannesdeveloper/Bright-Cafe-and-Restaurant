@@ -24,27 +24,39 @@ export async function clearMemCache(...keys: string[]) {
   keys.forEach(k => _memCache.delete(k));
 }
 
-// Menu Items — 8 MB payload, bypasses unstable_cache (2 MB limit)
+// Menu Items — select without image column (8 MB), map image to /api/menu/image/[id]
 export async function getMenuItems(): Promise<any[]> {
-  // 1. In-process memory cache (fastest, no size limit)
   const mem = memGet<any[]>('menuItems');
   if (mem) return mem;
 
-  // 2. Redis cache (fast, distributed)
   const redis = await getRedisCache<any[]>('menuItems');
   if (redis) { memSet('menuItems', redis, 300); return redis; }
 
-  // 3. Supabase (source of truth)
   const { data, error } = await supabase
     .from('menu_items')
-    .select('id,name,description,price,category,image,available,rating,created_at')
+    .select('id,name,description,price,category,available,rating,created_at')
     .order('id');
   if (error) throw new Error(error.message);
 
-  const items = data || [];
+  const items = (data || []).map((item: any) => ({
+    ...item,
+    image: `/api/menu/image/${item.id}`,
+  }));
+
   memSet('menuItems', items, 300);
   await setRedisCache('menuItems', items, 300);
   return items;
+}
+
+// Fetch a single menu item's raw image (used by admin for uploads/edits)
+export async function getMenuItemImage(id: number): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('menu_items')
+    .select('image')
+    .eq('id', id)
+    .single();
+  if (error || !data) return null;
+  return data.image;
 }
 
 // Menu Images — also large, same strategy
