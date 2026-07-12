@@ -343,6 +343,46 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Events */}
+      <section id="events" className="relative px-4 py-24">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/3 via-transparent to-transparent" />
+        <div className="relative max-w-6xl mx-auto">
+          <div className={`text-center mb-14 ${sectionHeaderClass(0)}`}>
+            <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Special Events</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Upcoming <span className="text-[#D4AF37]">Events</span></h2>
+            <p className="text-white/40 text-lg">Join us for unforgettable evenings</p>
+          </div>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+            className="relative rounded-3xl overflow-hidden border border-white/[0.06] group"
+          >
+            <div className="aspect-[21/9] sm:aspect-[3/1]">
+              <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1200&q=80" alt="Piano Night" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async" />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050508]/95 via-[#050508]/70 to-transparent" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="p-8 sm:p-12 lg:p-16 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold mb-6">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+                  Every Tuesday &amp; Thursday
+                </div>
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">Piano <span className="text-[#D4AF37]">Night</span></h3>
+                <p className="text-white/60 text-lg mb-8 max-w-md leading-relaxed">Enjoy live piano performances while savoring our exquisite dishes. An elegant evening of music and fine dining.</p>
+                <div className="flex items-center gap-6 text-sm text-white/50">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#D4AF37]/70" />
+                    <span>7:00 PM - 10:00 PM</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-[#D4AF37]/70" />
+                    <span>Reservations Open</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Gallery */}
       <section id="gallery" className="relative px-4 py-24">
         <div className="max-w-7xl mx-auto">
