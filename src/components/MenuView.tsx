@@ -28,7 +28,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [menuItems, setMenuItems] = useState<any[]>(FALLBACK_MENU.map(i => ({ ...i, available: true })));
+  const [menuItems, setMenuItems] = useState<any[] | null>(null);
   const [settings, setSettings] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState<string>(searchParams.get('category') || '');
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,7 +39,8 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
       if (cached) { setMenuItems(cached); return; }
       const data = await getMenuItems();
       if (data.length > 0) { setMenuItems(data); setCache('menuItems', data); }
-    } catch {}
+      else { setMenuItems([]); }
+    } catch { setMenuItems([]); }
   }, []);
 
   useEffect(() => {
@@ -64,7 +65,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
     return () => { supabase.removeChannel(channel); clearInterval(interval); };
   }, []);
 
-  const filteredItems = useMemo(() => menuItems.filter(item => {
+  const filteredItems = useMemo(() => (menuItems ?? []).filter(item => {
     const q = searchQuery.toLowerCase();
     return !q || item.name.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q);
   }), [menuItems, searchQuery]);
@@ -233,7 +234,12 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
 
         {/* Menu Sections */}
         <main className="mx-auto max-w-7xl px-4 pb-24 pt-2">
-          {filteredItems.length === 0 && (
+          {menuItems === null && (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-8 h-8 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
+            </div>
+          )}
+          {menuItems !== null && filteredItems.length === 0 && (
             <div className="text-center py-20">
               <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
                 <Search className="w-6 h-6 text-white/30" />
