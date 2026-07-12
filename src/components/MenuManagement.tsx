@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, Search, Image as ImageIcon, Upload, X, Sparkles, ChevronDown, Grid3X3, List, Package } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface FoodItem {
@@ -34,13 +34,13 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
     reader.readAsDataURL(file);
   };
 
-  const categories = ['all', ...Array.from(new Set(items.map(i => i.category)))];
+  const categories = useMemo(() => ['all', ...Array.from(new Set(items.map(i => i.category)))], [items]);
 
-  const filteredItems = items.filter(item => {
+  const filteredItems = useMemo(() => items.filter(item => {
     const q = searchQuery.toLowerCase();
     return (item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q)) &&
       (selectedCategory === 'all' || item.category === selectedCategory);
-  });
+  }), [items, searchQuery, selectedCategory]);
 
   return (
     <div className="space-y-6">
@@ -119,7 +119,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                 {/* Image */}
                 <div className="relative h-40 overflow-hidden">
                   {item.image?.match(/^(https?|data):/) ? (
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
                       <ImageIcon className="w-10 h-10 text-amber-500/20" />
@@ -192,7 +192,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                 <div className="col-span-4 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/[0.04] shrink-0">
                     {item.image?.match(/^(https?|data):/) ? (
-                      <img src={item.image} alt="" className="w-full h-full object-cover" />
+                      <img src={item.image} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <ImageIcon className="w-4 h-4 text-white/20" />
@@ -331,7 +331,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                       <input type="file" ref={fileInputRef} accept="image/*" onChange={handleFileUpload} className="hidden" />
                       {uploadedImage ? (
                         <div className="relative w-full h-full group">
-                          <img src={uploadedImage} alt="Preview" className="w-full h-full object-contain p-2" />
+                          <img src={uploadedImage} alt="Preview" className="w-full h-full object-contain p-2" loading="lazy" decoding="async" />
                           <button type="button" onClick={(e) => { e.stopPropagation(); setUploadedImage(''); if (fileInputRef.current) fileInputRef.current.value = ''; }}
                             className="absolute top-2 right-2 px-2 py-1 bg-red-500/80 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">Remove</button>
                         </div>

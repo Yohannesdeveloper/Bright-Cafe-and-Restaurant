@@ -48,7 +48,7 @@ export function Favorites({ items, onRemove, onAddToCart }: FavoritesProps) {
             <div className="relative">
               <div className="h-48 bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 flex items-center justify-center overflow-hidden">
                 {item.image?.match(/^(https?|data):/) ? (
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 ) : (
                   <span className="text-6xl">{item.image}</span>
                 )}
