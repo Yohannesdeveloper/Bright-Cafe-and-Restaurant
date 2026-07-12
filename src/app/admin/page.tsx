@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion';
 import {
-  TrendingUp, Users, ShoppingCart, DollarSign, ArrowUpRight,
-  ArrowDownRight, Clock, Star, ChefHat, Utensils, Package,
-  MessageSquare, Settings, Table, Sparkles, Activity
+  TrendingUp, ShoppingCart, DollarSign, ArrowUpRight,
+  ArrowDownRight, Clock, Star, ChefHat, Utensils,
+  Table, Sparkles, Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -23,10 +23,6 @@ const quickActions = [
   { label: 'Menu', href: '/admin/menu', icon: Utensils, desc: 'Manage dishes & categories', color: 'from-amber-500/10 to-amber-600/5', border: 'border-amber-500/20', iconBg: 'bg-amber-500/15', iconColor: 'text-amber-400' },
   { label: 'Orders', href: '/admin/orders', icon: ShoppingCart, desc: 'Track & fulfill orders', color: 'from-blue-500/10 to-blue-600/5', border: 'border-blue-500/20', iconBg: 'bg-blue-500/15', iconColor: 'text-blue-400' },
   { label: 'Tables', href: '/admin/tables', icon: Table, desc: 'Manage seating & QR', color: 'from-emerald-500/10 to-emerald-600/5', border: 'border-emerald-500/20', iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400' },
-  { label: 'Staff', href: '/admin/staff', icon: Users, desc: 'Manage team members', color: 'from-purple-500/10 to-purple-600/5', border: 'border-purple-500/20', iconBg: 'bg-purple-500/15', iconColor: 'text-purple-400' },
-  { label: 'Inventory', href: '/admin/inventory', icon: Package, desc: 'Track stock levels', color: 'from-cyan-500/10 to-cyan-600/5', border: 'border-cyan-500/20', iconBg: 'bg-cyan-500/15', iconColor: 'text-cyan-400' },
-  { label: 'Reviews', href: '/admin/reviews', icon: MessageSquare, desc: 'Moderate feedback', color: 'from-pink-500/10 to-pink-600/5', border: 'border-pink-500/20', iconBg: 'bg-pink-500/15', iconColor: 'text-pink-400' },
-  { label: 'Settings', href: '/admin/settings', icon: Settings, desc: 'Restaurant preferences', color: 'from-slate-500/10 to-slate-600/5', border: 'border-slate-500/20', iconBg: 'bg-slate-500/15', iconColor: 'text-slate-400' },
 ];
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } };
@@ -251,7 +247,7 @@ export default function AdminDashboard() {
           <Sparkles className="w-4 h-4 text-[#D4AF37]" />
           <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider">Quick Actions</h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {quickActions.map((action) => (
             <motion.div key={action.label} variants={itemAnim}>
               <Link href={action.href}>

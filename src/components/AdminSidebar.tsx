@@ -3,8 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard, UtensilsCrossed, ShoppingBag, Package,
-  MessageSquare, Table2, Users, Settings, LogOut, ChefHat,
+  LayoutDashboard, UtensilsCrossed, ShoppingBag,
+  Table2, LogOut, ChefHat,
   Menu, X, ChevronRight, Bell
 } from 'lucide-react';
 import { useState } from 'react';
@@ -16,10 +16,6 @@ const navItems = [
   { label: 'Orders', href: '/admin/orders', icon: ShoppingBag, badge: true },
   { label: 'Menu', href: '/admin/menu', icon: UtensilsCrossed },
   { label: 'Tables', href: '/admin/tables', icon: Table2 },
-  { label: 'Inventory', href: '/admin/inventory', icon: Package },
-  { label: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
-  { label: 'Staff', href: '/admin/staff', icon: Users },
-  { label: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {

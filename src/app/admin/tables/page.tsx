@@ -5,15 +5,32 @@ import { useEffect, useState } from 'react';
 import { checkAdminAuth } from '@/lib/admin-auth';
 import { getRestaurantTables, addRestaurantTable, updateRestaurantTable, deleteRestaurantTable } from '@/lib/actions';
 
+const seedTables = async () => {
+  const locations = ['Main Hall', 'Terrace', 'VIP Room', 'Garden', 'Balcony'];
+  for (let i = 1; i <= 15; i++) {
+    const number = i.toString();
+    const capacity = i <= 5 ? 2 : i <= 10 ? 4 : 6;
+    const location = locations[i % locations.length];
+    const qrCode = typeof window !== 'undefined' ? `${window.location.origin}/menu/${number}` : '';
+    await addRestaurantTable({ number, capacity, location, qr_code: qrCode, status: 'available' });
+  }
+};
+
 export default function AdminTablesPage() {
   const [tables, setTables] = useState<any[]>([]);
   const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    checkAdminAuth().then((authed) => {
+    checkAdminAuth().then(async (authed) => {
       if (!authed) { window.location.href = '/admin/login'; return; }
       setAuthorized(true);
-      getRestaurantTables().then(setTables).catch(console.error);
+      const existing = await getRestaurantTables();
+      if (existing.length === 0) {
+        await seedTables();
+        setTables(await getRestaurantTables());
+      } else {
+        setTables(existing);
+      }
     });
   }, []);
 

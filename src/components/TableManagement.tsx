@@ -83,10 +83,24 @@ export function TableManagement({ tables, onAdd, onEdit, onDelete }: TableManage
                     {table.location}
                   </div>
                 </div>
-                <button onClick={() => setSelectedTable({ ...table, qrCode: getMenuUrl(table.number) })}
-                  className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-medium hover:bg-white/[0.08] hover:text-[#D4AF37] transition-all flex items-center justify-center gap-2">
-                  <QrCode className="w-3.5 h-3.5" /> Generate QR
-                </button>
+                <div className="flex gap-2">
+                  {table.status === 'available' && (
+                    <button onClick={() => onEdit(table.id, { status: 'reserved' })}
+                      className="flex-1 px-3 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-medium hover:brightness-110 transition-all flex items-center justify-center gap-1.5">
+                      Reserve
+                    </button>
+                  )}
+                  {table.status === 'reserved' && (
+                    <button onClick={() => onEdit(table.id, { status: 'available' })}
+                      className="flex-1 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-medium hover:bg-white/[0.08] transition-all flex items-center justify-center gap-1.5">
+                      Cancel Reserve
+                    </button>
+                  )}
+                  <button onClick={() => setSelectedTable({ ...table, qrCode: getMenuUrl(table.number) })}
+                    className="flex-1 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white/50 text-xs font-medium hover:bg-white/[0.08] hover:text-[#D4AF37] transition-all flex items-center justify-center gap-1.5">
+                    <QrCode className="w-3.5 h-3.5" /> QR
+                  </button>
+                </div>
               </motion.div>
             );
           })}
