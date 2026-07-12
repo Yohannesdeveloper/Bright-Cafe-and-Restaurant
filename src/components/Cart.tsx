@@ -35,14 +35,14 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem, o
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 z-50"
           />
           
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            transition={{ type: 'tween', duration: 0.2, ease: 'easeOut' }}
             className="fixed right-0 top-0 h-full w-full max-w-md z-50"
           >
             <GlassCard className="h-full rounded-none border-r border-[#D4AF37]/20">
