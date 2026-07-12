@@ -62,7 +62,10 @@ export default function LandingPage() {
 
   useEffect(() => {
     getRestaurantSettings().then(setSettings).catch(() => {});
-    getMenuItems().then(data => setFeatured(data.filter(Boolean).slice(0, 6))).catch(() => {});
+    getMenuItems().then(data => {
+      const drinkCats = ['Beverages & Drinks', 'Hot Drinks', 'Juice & Shakes', 'Soft Drinks'];
+      setFeatured(data.filter(Boolean).filter(item => !drinkCats.includes(item.category)).slice(0, 6));
+    }).catch(() => {});
   }, []);
 
   const fadeUp = (delay = 0) => ({ initial: { opacity: 0, y: 50 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-80px' }, transition: { duration: 0.7, delay } });
