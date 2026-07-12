@@ -20,6 +20,19 @@ export function AdminMenuClient() {
     getMenuItems().then(data => {
       if (data.length > 0) { setItems(data); setCache('adminMenuItems', data); }
     }).catch(() => {});
+    // Background load images
+    import('@/lib/actions').then(({ getMenuImages }) =>
+      getMenuImages().then(images => {
+        if (images.length > 0) {
+          const imgMap = Object.fromEntries(images.map((i: any) => [i.id, i.image]));
+          setItems(prev => {
+            const merged = (prev ?? []).map((item: any) => ({ ...item, image: imgMap[item.id] || item.image }));
+            setCache('adminMenuItems', merged);
+            return merged;
+          });
+        }
+      }).catch(() => {})
+    );
   }, []);
 
   if (items === null) {
@@ -47,6 +60,18 @@ export function AdminMenuClient() {
     try {
       const data = await getMenuItems();
       if (data.length > 0) { setItems(data); setCache('adminMenuItems', data); }
+    } catch {}
+    try {
+      const { getMenuImages } = await import('@/lib/actions');
+      const images = await getMenuImages();
+      if (images.length > 0) {
+        const imgMap = Object.fromEntries(images.map((i: any) => [i.id, i.image]));
+        setItems(prev => {
+          const merged = (prev ?? []).map((item: any) => ({ ...item, image: imgMap[item.id] || item.image }));
+          setCache('adminMenuItems', merged);
+          return merged;
+        });
+      }
     } catch {}
     finally { setRefreshing(false); }
   };

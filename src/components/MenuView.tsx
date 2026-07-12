@@ -11,7 +11,6 @@ import { getCached, setCache } from '@/lib/cache';
 import { supabase } from '@/lib/supabase';
 import { ThemeToggle } from './ThemeToggle';
 import { QRCodeSVG } from 'qrcode.react';
-import { FALLBACK_MENU } from '@/lib/menu-data';
 
 interface CartItem {
   id: number;
@@ -37,6 +36,19 @@ export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; 
     try {
       const data = await getMenuItems();
       if (data.length > 0) { setMenuItems(data); setCache('menuItems', data); }
+    } catch {}
+    // Background load images
+    try {
+      const { getMenuImages } = await import('@/lib/actions');
+      const images = await getMenuImages();
+      if (images.length > 0) {
+        const imgMap = Object.fromEntries(images.map((i: any) => [i.id, i.image]));
+        setMenuItems(prev => {
+          const merged = (prev ?? []).map((item: any) => ({ ...item, image: imgMap[item.id] || item.image }));
+          setCache('menuItems', merged);
+          return merged;
+        });
+      }
     } catch {}
   }, []);
 

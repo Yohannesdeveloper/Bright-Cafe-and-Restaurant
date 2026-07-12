@@ -4,7 +4,13 @@ import { supabase } from './supabase';
 
 // Menu Items
 export async function getMenuItems() {
-  const { data, error } = await supabase.from('menu_items').select('*').order('id');
+  const { data, error } = await supabase.from('menu_items').select('id,name,description,price,category,available,rating,created_at').order('id');
+  if (error) throw new Error(error.message);
+  return data || [];
+}
+
+export async function getMenuImages() {
+  const { data, error } = await supabase.from('menu_items').select('id,image').order('id');
   if (error) throw new Error(error.message);
   return data || [];
 }
