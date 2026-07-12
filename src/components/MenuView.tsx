@@ -137,7 +137,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
       <div className="relative">
         {/* Sticky Header */}
         <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#050508]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/[0.04]">
-          <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
+          <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
             <div className="flex min-w-0 items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/20 flex items-center justify-center">
                 <span className="text-[#D4AF37] text-xs font-bold">B</span>
@@ -166,7 +166,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
 
         {/* Restaurant Hero */}
         <div className="relative px-4 pb-8 pt-8 text-center">
-          <div className="mx-auto max-w-4xl">
+          <div className="mx-auto max-w-7xl">
             <div className="inline-block p-1 rounded-full bg-gradient-to-r from-[#D4AF37]/30 to-transparent mb-6">
               <img src="/PNG-01.png" alt="Logo" className="h-20 w-auto mx-auto drop-shadow-2xl" />
             </div>
@@ -182,7 +182,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
         </div>
 
         {/* Search Bar */}
-        <div className="mx-auto max-w-4xl px-4 pb-5">
+        <div className="mx-auto max-w-7xl px-4 pb-5">
           <div className="relative group">
             <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-[#D4AF37]/20 to-transparent opacity-0 group-focus-within:opacity-100 blur transition-opacity" />
             <div className="relative flex items-center">
@@ -199,7 +199,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
         </div>
 
         {/* Category Tabs */}
-        <nav className="sticky top-[60px] z-30 mx-auto max-w-4xl overflow-x-auto px-4 py-3 bg-gradient-to-b from-white dark:from-[#050508] to-transparent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav className="sticky top-[60px] z-30 mx-auto max-w-7xl overflow-x-auto px-4 py-3 bg-gradient-to-b from-white dark:from-[#050508] to-transparent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="flex w-max items-center gap-2 p-1 rounded-2xl bg-black/5 dark:bg-white/[0.04]">
             {categoryNames.map(cat => (
               <button
@@ -219,7 +219,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
         </nav>
 
         {/* Menu Sections */}
-        <main className="mx-auto max-w-4xl px-4 pb-24 pt-2">
+        <main className="mx-auto max-w-7xl px-4 pb-24 pt-2">
           {filteredItems.length === 0 && (
             <div className="text-center py-20">
               <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
@@ -239,7 +239,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
                 <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white tracking-tight">{cat}</h2>
                 <div className="h-px flex-1 bg-gradient-to-l from-[#D4AF37]/40 to-transparent" />
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {groupedItems[cat].map((item, ii) => (
                   <motion.div
                     key={item.id}
@@ -249,7 +249,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
                     transition={{ delay: ii * 0.04, duration: 0.4 }}
                     className="group relative flex items-stretch gap-2 rounded-2xl bg-white dark:bg-neutral-900/50 border border-black/5 dark:border-white/[0.06] p-1.5 sm:p-2 hover:border-[#D4AF37]/30 hover:shadow-lg hover:shadow-[#D4AF37]/5 dark:hover:shadow-[#D4AF37]/5 transition-all duration-300"
                   >
-                    <div className="relative h-full max-h-[120px] min-h-[7rem] w-[7rem] shrink-0 overflow-hidden rounded-xl sm:max-h-[8.5rem] sm:w-[8.5rem]">
+                    <div className="relative h-full max-h-[140px] min-h-[8rem] w-[8rem] shrink-0 overflow-hidden rounded-xl sm:max-h-[10rem] sm:w-[10rem]">
                       <button
                         type="button"
                         onClick={() => handleItemClick(item)}
@@ -281,12 +281,12 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
                       <button
                         type="button"
                         onClick={() => handleItemClick(item)}
-                        className="text-left text-sm font-semibold leading-snug text-pretty sm:text-base group-hover:text-[#D4AF37] transition-colors"
+                        className="text-left text-sm font-semibold leading-snug text-pretty sm:text-lg group-hover:text-[#D4AF37] transition-colors"
                       >
                         {item.name}
                       </button>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-bold sm:text-base bg-gradient-to-r from-[#D4AF37] to-[#E5C158] bg-clip-text text-transparent">
+                        <span className="text-base font-bold sm:text-lg bg-gradient-to-r from-[#D4AF37] to-[#E5C158] bg-clip-text text-transparent">
                           Br. {item.price.toFixed(2)}
                         </span>
                         <button
@@ -339,7 +339,7 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
 
       {/* Footer */}
       <footer className="border-t border-black/10 dark:border-white/10">
-        <div className="mx-auto max-w-4xl px-4 py-10">
+        <div className="mx-auto max-w-7xl px-4 py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* QR Code */}
             <div className="text-center md:text-left">
