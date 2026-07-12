@@ -2,8 +2,6 @@ import { getMenuItems } from '@/lib/actions';
 import { Suspense } from 'react';
 import { MenuView } from '@/components/MenuView';
 
-export const dynamic = 'force-dynamic';
-
 export default async function MenuPage({ searchParams }: { searchParams: Promise<{ table?: string; category?: string }> }) {
   const params = await searchParams;
   let initialItems: any[] = [];
