@@ -53,10 +53,22 @@ export default function AdminMenuPage() {
   };
   if (authorized === null) {
     return (
-      <div className="min-h-screen bg-[#050508] flex items-center justify-center">
-        <div className="relative">
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
-          <div className="w-14 h-14 border-2 border-[#D4AF37]/10 rounded-full absolute inset-0 animate-ping opacity-30" />
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Skeleton header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="h-8 w-40 bg-white/[0.04] rounded-lg animate-pulse" />
+          <div className="h-10 w-32 bg-white/[0.04] rounded-xl animate-pulse" />
+        </div>
+        {/* Skeleton search & filters */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="h-10 flex-1 bg-white/[0.04] rounded-xl animate-pulse" />
+          <div className="h-10 w-40 bg-white/[0.04] rounded-xl animate-pulse" />
+        </div>
+        {/* Skeleton grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="rounded-2xl overflow-hidden aspect-[3/4] bg-white/[0.03] animate-pulse" />
+          ))}
         </div>
       </div>
     );
