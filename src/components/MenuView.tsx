@@ -2,7 +2,8 @@
 
 import { FoodModal } from '@/components/FoodModal';
 import { Cart } from '@/components/Cart';
-import { ShoppingBag, Plus, Globe, Camera, MessageCircle, Play, Phone, MapPin } from 'lucide-react';
+import { ShoppingBag, Plus, Search, Globe, Camera, MessageCircle, Play, Phone, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { getMenuItems, getRestaurantSettings, createOrder } from '@/lib/actions';
 import { supabase } from '@/lib/supabase';
@@ -126,161 +127,193 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-neutral-950 text-black dark:text-white font-['Inter',system-ui,sans-serif]">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-neutral-950/90 backdrop-blur">
-        <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="text-sm font-medium text-black/60 dark:text-white/60">
-              {tableNumber ? `Table ${tableNumber}` : 'Menu'}
-            </span>
+    <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-white dark:from-[#050508] dark:to-[#0a0a12] text-black dark:text-white">
+      {/* Ambient Glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-[#D4AF37]/3 dark:bg-[#D4AF37]/5 blur-[150px]" />
+        <div className="absolute bottom-1/4 -right-32 w-96 h-96 rounded-full bg-[#D4AF37]/2 dark:bg-[#D4AF37]/3 blur-[150px]" />
+      </div>
+
+      <div className="relative">
+        {/* Sticky Header */}
+        <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#050508]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/[0.04]">
+          <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/20 flex items-center justify-center">
+                <span className="text-[#D4AF37] text-xs font-bold">B</span>
+              </div>
+              <span className="text-sm font-medium text-black/50 dark:text-white/50">
+                {tableNumber ? `Table ${tableNumber}` : 'Our Menu'}
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-black dark:text-white shadow-sm transition hover:border-[#D4AF37]/40 hover:shadow-[#D4AF37]/10 active:scale-95"
+                aria-label="Cart"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                {cartCount > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#D4AF37] text-[10px] font-bold text-white shadow-lg shadow-[#D4AF37]/30">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <ThemeToggle />
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-black dark:text-white shadow-sm transition hover:opacity-90"
-              aria-label="Cart"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              {cartCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4AF37] text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
-              )}
-            </button>
+        </header>
+
+        {/* Restaurant Hero */}
+        <div className="relative px-4 pb-8 pt-8 text-center">
+          <div className="mx-auto max-w-4xl">
+            <div className="inline-block p-1 rounded-full bg-gradient-to-r from-[#D4AF37]/30 to-transparent mb-6">
+              <img src="/PNG-01.png" alt="Logo" className="h-20 w-auto mx-auto drop-shadow-2xl" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black dark:text-white">
+              {settings?.name || 'Bright Cafe and Restaurant'}
+            </h1>
+            {settings?.description && (
+              <p className="mt-2 text-sm font-medium uppercase tracking-[0.3em] text-[#D4AF37]/70">
+                {settings.description}
+              </p>
+            )}
           </div>
         </div>
-      </header>
 
-      {/* Restaurant Hero */}
-      <div className="px-4 pb-6 pt-4 text-center">
-        <img src="/PNG-01.png" alt="Logo" className="h-16 w-auto mx-auto mb-4" />
-        <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-white">
-          {settings?.name || 'Bright Cafe and Restaurant'}
-        </h1>
-        {settings?.description && (
-          <p className="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-black/70 dark:text-white/70">
-            {settings.description}
-          </p>
-        )}
-      </div>
+        {/* Search Bar */}
+        <div className="mx-auto max-w-4xl px-4 pb-5">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-[#D4AF37]/20 to-transparent opacity-0 group-focus-within:opacity-100 blur transition-opacity" />
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 w-4 h-4 text-black/30 dark:text-white/30 group-focus-within:text-[#D4AF37] transition-colors" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search menu items..."
+                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white dark:bg-neutral-900/80 border border-black/10 dark:border-white/10 text-sm text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
+              />
+            </div>
+          </div>
+        </div>
 
-      {/* Search Bar */}
-      <div className="mx-auto max-w-4xl px-4 pb-4">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search menu items..."
-          className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-neutral-900 border border-black/10 dark:border-white/10 text-sm text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors"
-        />
-      </div>
-
-      {/* Category Tabs */}
-      <nav className="sticky top-[56px] z-30 mx-auto max-w-4xl overflow-x-auto px-4 py-2 bg-white dark:bg-neutral-950 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <ul className="flex w-max items-center gap-5">
-          {categoryNames.map(cat => (
-            <li key={cat}>
+        {/* Category Tabs */}
+        <nav className="sticky top-[60px] z-30 mx-auto max-w-4xl overflow-x-auto px-4 py-3 bg-gradient-to-b from-white dark:from-[#050508] to-transparent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex w-max items-center gap-2 p-1 rounded-2xl bg-black/5 dark:bg-white/[0.04]">
+            {categoryNames.map(cat => (
               <button
+                key={cat}
                 type="button"
                 onClick={() => scrollToCategory(cat)}
-                className={`relative whitespace-nowrap py-1 text-sm font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:rounded-full after:transition-opacity ${
+                className={`relative whitespace-nowrap px-4 py-2 text-sm font-medium rounded-xl transition-all ${
                   activeCategory === cat
-                    ? 'text-[#D4AF37] after:bg-[#D4AF37] after:opacity-100'
-                    : 'text-black/60 dark:text-white/60 after:opacity-0 hover:text-black dark:hover:text-white'
+                    ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/25'
+                    : 'text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/[0.06]'
                 }`}
               >
                 {cat}
               </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Menu Sections */}
-      <main className="mx-auto max-w-4xl px-4 pb-20 pt-5">
-        {filteredItems.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-black/40 dark:text-white/40 text-sm">No items match your search</p>
+            ))}
           </div>
-        )}
-        {categoryNames.map(cat => (
-          <section
-            key={cat}
-            id={`cat-${cat}`}
-            className="scroll-mt-[104px] pt-2 sm:scroll-mt-[108px]"
-          >
-            <h2 className="text-xl font-semibold sm:text-2xl text-black dark:text-white">{cat}</h2>
-            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {groupedItems[cat].map(item => (
-                <article
-                  key={item.id}
-                  className="flex items-stretch gap-2 rounded-2xl bg-white dark:bg-neutral-900 p-1.5 sm:p-2"
-                >
-                  <div className="relative h-full max-h-[115px] min-h-[6.5625rem] w-[6.5625rem] shrink-0 sm:max-h-[8.4375rem]">
-                    <button
-                      type="button"
-                      onClick={() => handleItemClick(item)}
-                      className="h-full w-full overflow-hidden rounded-xl border border-black/10 dark:border-white/10 cursor-zoom-in"
-                    >
-                      <div className="h-full w-full">
-                        {item.image?.match(/^(https?|data):/) ? (
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="h-full w-full object-cover object-center"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-4xl">
-                            {item.image}
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                    {!item.available && (
-                      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
-                        <span className="text-white/80 text-xs font-semibold px-2 py-1 rounded-full bg-red-500/20 border border-red-500/30">Unavailable</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex min-w-0 flex-1 flex-col justify-between gap-y-1 px-1.5 py-1">
-                    <button
-                      type="button"
-                      onClick={() => handleItemClick(item)}
-                      className="text-left text-sm font-semibold leading-snug text-pretty sm:text-base hover:underline underline-offset-4"
-                    >
-                      {item.name}
-                    </button>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-semibold sm:text-base">
-                        Br. {item.price.toFixed(2)}
-                      </span>
+        </nav>
+
+        {/* Menu Sections */}
+        <main className="mx-auto max-w-4xl px-4 pb-24 pt-2">
+          {filteredItems.length === 0 && (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
+                <Search className="w-6 h-6 text-white/30" />
+              </div>
+              <p className="text-white/40 text-sm">No items match your search</p>
+            </div>
+          )}
+          {categoryNames.map((cat, ci) => (
+            <section
+              key={cat}
+              id={`cat-${cat}`}
+              className="scroll-mt-[120px] pt-6 sm:scroll-mt-[124px]"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-px flex-1 bg-gradient-to-r from-[#D4AF37]/40 to-transparent" />
+                <h2 className="text-lg sm:text-xl font-bold text-black dark:text-white tracking-tight">{cat}</h2>
+                <div className="h-px flex-1 bg-gradient-to-l from-[#D4AF37]/40 to-transparent" />
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {groupedItems[cat].map((item, ii) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-50px' }}
+                    transition={{ delay: ii * 0.04, duration: 0.4 }}
+                    className="group relative flex items-stretch gap-2 rounded-2xl bg-white dark:bg-neutral-900/50 border border-black/5 dark:border-white/[0.06] p-1.5 sm:p-2 hover:border-[#D4AF37]/30 hover:shadow-lg hover:shadow-[#D4AF37]/5 dark:hover:shadow-[#D4AF37]/5 transition-all duration-300"
+                  >
+                    <div className="relative h-full max-h-[120px] min-h-[7rem] w-[7rem] shrink-0 overflow-hidden rounded-xl sm:max-h-[8.5rem] sm:w-[8.5rem]">
                       <button
                         type="button"
-                        disabled={!item.available}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (item.available) handleAddToCart(item, 1, []);
-                        }}
-                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full shadow-sm transition active:scale-90 ${
-                          item.available
-                            ? 'bg-[#D4AF37] text-white hover:opacity-90'
-                            : 'bg-white/10 text-white/30 cursor-not-allowed'
-                        }`}
-                        aria-label={`Add ${item.name} to order`}
+                        onClick={() => handleItemClick(item)}
+                        className="h-full w-full cursor-zoom-in"
                       >
-                        <Plus className="h-4 w-4" />
+                        <div className="h-full w-full">
+                          {item.image?.match(/^(https?|data):/) ? (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 text-4xl">
+                              {item.image}
+                            </div>
+                          )}
+                        </div>
                       </button>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {!item.available && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                          <span className="text-white/80 text-xs font-semibold px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/30">Unavailable</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        ))}
-      </main>
+                    <div className="flex min-w-0 flex-1 flex-col justify-between gap-y-1 px-1.5 py-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleItemClick(item)}
+                        className="text-left text-sm font-semibold leading-snug text-pretty sm:text-base group-hover:text-[#D4AF37] transition-colors"
+                      >
+                        {item.name}
+                      </button>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-sm font-bold sm:text-base bg-gradient-to-r from-[#D4AF37] to-[#E5C158] bg-clip-text text-transparent">
+                          Br. {item.price.toFixed(2)}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={!item.available}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (item.available) handleAddToCart(item, 1, []);
+                          }}
+                          className={`inline-flex h-9 w-9 items-center justify-center rounded-xl shadow-sm transition-all active:scale-90 ${
+                            item.available
+                              ? 'bg-gradient-to-br from-[#D4AF37] to-[#E5C158] text-white hover:shadow-lg hover:shadow-[#D4AF37]/30'
+                              : 'bg-white/10 text-white/30 cursor-not-allowed'
+                          }`}
+                          aria-label={`Add ${item.name} to order`}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </main>
+      </div>
 
       {/* Map Section */}
       <section className="border-t border-black/10 dark:border-white/10">
