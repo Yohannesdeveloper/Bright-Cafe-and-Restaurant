@@ -22,13 +22,13 @@ interface CartItem {
   image: string;
 }
 
-export function MenuView({ tableNumber }: { tableNumber?: string }) {
+export function MenuView({ tableNumber, initialItems }: { tableNumber?: string; initialItems?: any[] }) {
   const searchParams = useSearchParams();
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [menuItems, setMenuItems] = useState<any[]>(() => getCached<any[]>('menuItems') || FALLBACK_MENU.map(i => ({ ...i, available: true })));
+  const [menuItems, setMenuItems] = useState<any[]>(() => initialItems && initialItems.length > 0 ? initialItems : getCached<any[]>('menuItems') || FALLBACK_MENU.map(i => ({ ...i, available: true })));
   const [settings, setSettings] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState<string>(searchParams.get('category') || '');
   const [searchQuery, setSearchQuery] = useState('');
