@@ -344,7 +344,7 @@ export default function LandingPage() {
             <p className="text-white/40 text-lg">Experience the atmosphere before you arrive</p>
           </motion.div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[IMG.interior1, IMG.interior2, IMG.interior3, IMG.interior4].map((img, i) => (
+            {[IMG.interior1, '/Traditional%20coffee.jpg', IMG.interior3, IMG.interior4].map((img, i) => (
               <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 className={`relative overflow-hidden rounded-2xl ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`}
               >
