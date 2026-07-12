@@ -52,9 +52,16 @@ export function MenuView({ tableNumber }: { tableNumber?: string }) {
   }, [fetchAndMergeMenu]);
 
   useEffect(() => {
-    const cached = getCached<any>('settings');
-    if (cached) setSettings(cached);
-    else getRestaurantSettings().then(d => { setSettings(d); setCache('settings', d); }).catch(() => {});
+    getRestaurantSettings().then(setSettings).catch(() => {});
+    const channel = supabase.channel('settings')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'restaurant_settings' }, () => {
+        getRestaurantSettings().then(setSettings).catch(() => {});
+      })
+      .subscribe();
+    const interval = setInterval(() => {
+      getRestaurantSettings().then(setSettings).catch(() => {});
+    }, 5000);
+    return () => { supabase.removeChannel(channel); clearInterval(interval); };
   }, []);
 
   const filteredItems = useMemo(() => menuItems.filter(item => {
