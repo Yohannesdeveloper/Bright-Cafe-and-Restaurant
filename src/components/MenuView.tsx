@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getRestaurantSettings, createOrder } from '@/lib/actions';
 
 import { getCached, setCache } from '@/lib/cache';
@@ -184,7 +185,9 @@ export function MenuView({
         <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#050508]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/[0.04]">
           <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
             <div className="flex min-w-0 items-center gap-3">
-              <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={32} height={32} className="object-contain" priority />
+              <Link href="/" className="shrink-0">
+                <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={32} height={32} className="object-contain" priority />
+              </Link>
               <span className="text-sm font-medium text-black/50 dark:text-white/50">
                 {tableNumber ? `Table ${tableNumber}` : 'Our Menu'}
               </span>
