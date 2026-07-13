@@ -153,7 +153,9 @@ export default function LandingClient({ initialSettings, initialFeatured }: Land
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050508]/80 backdrop-blur-xl border-b border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <Image src="/PNG-01.png" alt="Bright Cafe" width={36} height={36} className="w-auto h-9" priority />
+            <a href="#hero" className="shrink-0">
+              <Image src="/PNG-01.png" alt="Bright Cafe" width={48} height={48} className="w-auto h-12" priority />
+            </a>
           </div>
           <div className="flex items-center gap-6">
             <Link href="/menu" className="text-sm text-white/60 hover:text-white transition-colors">Menu</Link>
@@ -169,7 +171,7 @@ export default function LandingClient({ initialSettings, initialFeatured }: Land
       </nav>
 
       {/* Hero */}
-      <motion.section style={{ scale: heroScale, opacity: heroOpacity }} className="relative min-h-screen flex items-center justify-center px-4 pt-16">
+      <motion.section id="hero" style={{ scale: heroScale, opacity: heroOpacity }} className="relative min-h-screen flex items-center justify-center px-4 pt-16">
         <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/8 via-transparent to-[#050508] pointer-events-none" />
         <div className="absolute inset-0">
           <div className="absolute top-1/3 left-1/3 w-[700px] h-[700px] rounded-full bg-[#D4AF37]/5 blur-[150px]" />
