@@ -154,7 +154,7 @@ export default function LandingClient({ initialSettings, initialFeatured }: Land
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
             <a href="#hero" className="shrink-0">
-              <Image src="/PNG-01.png" alt="Bright Cafe" width={48} height={48} className="w-auto h-12" priority />
+              <Image src="/PNG-01.png" alt="Bright Cafe" width={56} height={56} className="w-auto h-14" priority />
             </a>
           </div>
           <div className="flex items-center gap-6">

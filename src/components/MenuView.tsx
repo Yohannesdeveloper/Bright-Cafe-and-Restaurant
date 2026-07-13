@@ -186,7 +186,7 @@ export function MenuView({
           <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:py-3.5">
             <div className="flex min-w-0 items-center gap-3">
               <Link href="/" className="shrink-0">
-                <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={48} height={48} className="object-contain" priority />
+                <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={56} height={56} className="object-contain" priority />
               </Link>
               <span className="text-sm font-medium text-black/50 dark:text-white/50">
                 {tableNumber ? `Table ${tableNumber}` : 'Our Menu'}
