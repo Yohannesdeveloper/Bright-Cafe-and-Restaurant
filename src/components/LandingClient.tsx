@@ -237,15 +237,25 @@ export default function LandingClient({ initialSettings, initialFeatured }: Land
                 whileHover={{ y: -8 }} className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
               >
                 <Link href="/menu">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    loading={i < 3 ? 'eager' : 'lazy'}
-                    priority={i < 3}
-                  />
+                  {item.image?.match(/^\/api\//) ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      loading={i < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
+                    />
+                  ) : (
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                      loading={i < 3 ? 'eager' : 'lazy'}
+                      priority={i < 3}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-[#050508]/30 to-transparent" />
                   <div className="absolute top-3 left-3">
                     <span className="text-[10px] font-medium px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white/80">{item.category}</span>
