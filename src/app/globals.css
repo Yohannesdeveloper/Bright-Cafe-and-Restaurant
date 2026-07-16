@@ -13,8 +13,11 @@
   --sidebar-width: 280px;
   --font-geist-sans: 'Geist Sans', system-ui, -apple-system, sans-serif;
   --font-geist-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-playfair: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* ── Tailwind v4 Theme: Luxury Typography Scale ── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -22,8 +25,41 @@
   --color-gold-light: var(--gold-light);
   --color-gold-dark: var(--gold-dark);
   --color-gold-glow: var(--gold-glow);
-  --font-sans: var(--font-geist-sans);
+
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-playfair);
+  --font-serif: var(--font-playfair);
+
+  /* Scaled-up text sizes — every tier bumped for luxury readability */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.75rem;
+  --text-6xl: 4.5rem;
+  --text-7xl: 6rem;
+  --text-8xl: 8rem;
+
+  /* Luxury line-heights */
+  --leading-none: 1;
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+  --leading-loose: 2;
+
+  /* Elegant letter-spacing */
+  --tracking-tighter: -0.03em;
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
 }
 
 .dark {
@@ -32,12 +68,138 @@
   --sidebar-bg: #0a0a0f;
 }
 
+/* ── Base Typography ── */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
+/* ── Global Luxury Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+h1 {
+  font-size: var(--text-5xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+h3 {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+h4 {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+}
+
+h5 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+h6 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+p {
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+a {
+  letter-spacing: 0.01em;
+}
+
+strong, b {
+  font-weight: 700;
+}
+
+small {
+  font-size: var(--text-sm);
+}
+
+/* ── Luxury Font Utility Classes ── */
+.font-display {
+  font-family: var(--font-playfair), Georgia, 'Times New Roman', serif;
+}
+
+.font-body {
+  font-family: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Elegant headings */
+.heading-luxury {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* Refined body text */
+.text-refined {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.65;
+}
+
+/* Luxury price styling */
+.price-luxury {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Elegant uppercase labels */
+.label-elegant {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: var(--text-sm);
+}
+
+/* Luxury small text (badges, metadata) */
+.text-luxe-sm {
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+}
+
+.text-luxe-xs {
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+}
+
+/* ── Scrollbar ── */
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
@@ -60,6 +222,7 @@ body {
   background: var(--gold-light);
 }
 
+/* ── Animations ── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -124,3 +287,15 @@ body {
 .anim-delay-6 { animation-delay: 0.6s; }
 .anim-delay-7 { animation-delay: 0.7s; }
 .anim-delay-8 { animation-delay: 0.8s; }
+
+/* ── Luxury Selection Color ── */
+::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: #ffffff;
+}
+
+/* ── Focus ring luxury ── */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
