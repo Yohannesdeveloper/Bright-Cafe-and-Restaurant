@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Search, Image as ImageIcon, Upload, X, Sparkles, ChevronDown, Grid3X3, List, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Image as ImageIcon, Upload, X, Sparkles, ChevronDown, Package } from 'lucide-react';
 import { useState, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { uploadImageToStorage } from '@/lib/supabase';
@@ -24,7 +24,6 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
   const [uploadedImage, setUploadedImage] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,14 +132,6 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
           </div>
-          <div className="flex bg-white/[0.04] rounded-xl border border-white/[0.08] p-1">
-            <button onClick={() => setViewMode('grid')} className={cn('p-2 rounded-lg transition-all', viewMode === 'grid' ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'text-white/30 hover:text-white/60')}>
-              <Grid3X3 className="w-4 h-4" />
-            </button>
-            <button onClick={() => setViewMode('list')} className={cn('p-2 rounded-lg transition-all', viewMode === 'list' ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'text-white/30 hover:text-white/60')}>
-              <List className="w-4 h-4" />
-            </button>
-          </div>
           <motion.button
             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             onClick={() => { setEditingItem(null); setUploadedImage(''); setIsModalOpen(true); }}
@@ -152,9 +143,8 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
         </div>
       </div>
 
-      {/* Items Grid/List */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {/* Items Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <AnimatePresence mode="popLayout">
             {filteredItems.map((item, i) => (
               <motion.div
@@ -221,68 +211,6 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
             ))}
           </AnimatePresence>
         </div>
-      ) : (
-        <div className="rounded-2xl border border-white/[0.06] overflow-hidden">
-          <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-white/[0.03] border-b border-white/[0.06] text-xs text-white/40 font-medium uppercase tracking-wider">
-            <div className="col-span-4">Item</div>
-            <div className="col-span-2">Category</div>
-            <div className="col-span-2">Price</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-2 text-right">Actions</div>
-          </div>
-          <AnimatePresence>
-            {filteredItems.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.02 }}
-                className="grid grid-cols-12 gap-4 px-5 py-3.5 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors items-center"
-              >
-                <div className="col-span-4 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg overflow-hidden bg-white/[0.04] shrink-0">
-                  {item.image?.match(/^(https?:|data:|\/api\/)/) ? (
-                      <img src={item.image} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ImageIcon className="w-4 h-4 text-white/20" />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">{item.name}</p>
-                    {item.description && <p className="text-xs text-white/30 truncate max-w-[200px]">{item.description}</p>}
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-xs text-white/50">{item.category}</span>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-sm font-semibold text-[#D4AF37]">ETB {item.price}</span>
-                </div>
-                <div className="col-span-2">
-                  <span className={cn(
-                    'text-xs px-2 py-0.5 rounded-full',
-                    item.available ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-                  )}>
-                    {item.available ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                <div className="col-span-2 flex justify-end gap-1">
-                  <button onClick={() => { setEditingItem(item); setUploadedImage(''); setIsModalOpen(true); }}
-                    className="p-1.5 rounded-lg hover:bg-white/[0.06] text-white/40 hover:text-[#D4AF37] transition-all">
-                    <Edit className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => onDelete(item.id)}
-                    className="p-1.5 rounded-lg hover:bg-white/[0.06] text-white/40 hover:text-red-400 transition-all">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
 
       {/* Empty state */}
       {filteredItems.length === 0 && (
