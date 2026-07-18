@@ -7,7 +7,7 @@ import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag,
   Table2, LogOut, ChefHat,
   Menu, X, ChevronRight, Bell,
-  Search, Users, Package, Settings, Star
+  Search
 } from 'lucide-react';
 import { useState } from 'react';
 import { logoutAdmin } from '@/lib/admin-auth';
@@ -18,10 +18,6 @@ const navItems = [
   { label: 'Orders', href: '/admin/orders', icon: ShoppingBag, badge: true },
   { label: 'Menu', href: '/admin/menu', icon: UtensilsCrossed },
   { label: 'Tables', href: '/admin/tables', icon: Table2 },
-  { label: 'Staff', href: '/admin/staff', icon: Users },
-  { label: 'Inventory', href: '/admin/inventory', icon: Package },
-  { label: 'Reviews', href: '/admin/reviews', icon: Star },
-  { label: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
