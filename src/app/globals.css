@@ -201,15 +201,15 @@ small {
 
 /* ── Admin Compact Override ── */
 .admin-compact {
-  font-size: 1rem;
+  font-size: 1.0625rem;
 }
 .admin-compact h1 { font-size: var(--text-3xl); }
 .admin-compact h2 { font-size: var(--text-2xl); }
 .admin-compact h3 { font-size: var(--text-xl); }
 .admin-compact h4 { font-size: var(--text-lg); }
-.admin-compact .text-xs { font-size: 0.8125rem; }
-.admin-compact .text-sm { font-size: 1rem; }
-.admin-compact .text-base { font-size: 1.0625rem; }
+.admin-compact .text-xs { font-size: 0.875rem; }
+.admin-compact .text-sm { font-size: 1.0625rem; }
+.admin-compact .text-base { font-size: 1.125rem; }
 
 /* ── Scrollbar ── */
 * {
