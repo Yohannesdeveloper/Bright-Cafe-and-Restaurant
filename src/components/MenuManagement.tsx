@@ -184,7 +184,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                   </div>
                   {/* Category badge */}
                   <div className="absolute bottom-3 left-3">
-                    <span className="text-[10px] font-medium text-white/60 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/[0.06]">
+                    <span className="text-xs font-medium text-white/60 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/[0.06]">
                       {item.category}
                     </span>
                   </div>
@@ -200,7 +200,7 @@ export function MenuManagement({ items, onAdd, onEdit, onDelete }: MenuManagemen
                   )}
                   <div className="flex items-center gap-2 mt-2">
                     <span className={cn(
-                      'text-[10px] font-medium px-2 py-0.5 rounded-full',
+                      'text-xs font-medium px-2 py-0.5 rounded-full',
                       item.available ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
                     )}>
                       {item.available ? 'Available' : 'Sold Out'}

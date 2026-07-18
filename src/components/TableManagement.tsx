@@ -63,7 +63,7 @@ export function TableManagement({ tables, onAdd, onEdit, onDelete }: TableManage
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-lg font-bold text-white">Table {table.number}</h3>
-                      <span className={cn('px-2 py-0.5 rounded text-[10px] font-medium', sc.bg, sc.color)}>{sc.label}</span>
+                      <span className={cn('px-2 py-0.5 rounded text-xs font-medium', sc.bg, sc.color)}>{sc.label}</span>
                     </div>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
