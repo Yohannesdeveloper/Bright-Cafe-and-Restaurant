@@ -207,9 +207,9 @@ small {
 .admin-compact h2 { font-size: var(--text-2xl); }
 .admin-compact h3 { font-size: var(--text-xl); }
 .admin-compact h4 { font-size: var(--text-lg); }
-.admin-compact .text-xs { font-size: 0.9rem; }
-.admin-compact .text-sm { font-size: 1.1rem; }
-.admin-compact .text-base { font-size: 1.15rem; }
+.admin-compact .text-xs { font-size: 1rem; }
+.admin-compact .text-sm { font-size: 1.2rem; }
+.admin-compact .text-base { font-size: 1.25rem; }
 
 /* ── Scrollbar ── */
 * {
