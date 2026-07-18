@@ -188,7 +188,7 @@ export function MenuView({
               <Link href="/" className="shrink-0">
                 <Image src={settings?.logo || '/PNG-01.png'} alt="Logo" width={56} height={56} className="object-contain" priority />
               </Link>
-              <span className="text-sm font-medium text-black/50 dark:text-white/50">
+              <span className="text-xl sm:text-2xl font-semibold text-black/70 dark:text-white/70 tracking-tight">
                 {tableNumber ? `Table ${tableNumber}` : 'Our Menu'}
               </span>
             </div>
