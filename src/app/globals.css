@@ -199,6 +199,18 @@ small {
   letter-spacing: 0.04em;
 }
 
+/* ── Admin Compact Override ── */
+.admin-compact {
+  font-size: 0.875rem;
+}
+.admin-compact h1 { font-size: var(--text-xl); }
+.admin-compact h2 { font-size: var(--text-lg); }
+.admin-compact h3 { font-size: var(--text-base); }
+.admin-compact h4 { font-size: var(--text-sm); }
+.admin-compact .text-xs { font-size: 0.6875rem; }
+.admin-compact .text-sm { font-size: 0.8125rem; }
+.admin-compact .text-base { font-size: 0.875rem; }
+
 /* ── Scrollbar ── */
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;

@@ -34,7 +34,7 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
   if (isLogin) return <>{children}</>;
 
   return (
-    <div className="min-h-screen bg-[#050508]">
+    <div className="min-h-screen bg-[#050508] admin-compact">
       {/* Mobile overlay */}
       <AnimatePresence>
         {mobileOpen && (
