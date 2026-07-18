@@ -6,7 +6,8 @@ import Link from 'next/link';
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag,
   Table2, LogOut, ChefHat,
-  Menu, X, ChevronRight, Bell
+  Menu, X, ChevronRight, Bell,
+  Search, Users, Package, Settings, Star
 } from 'lucide-react';
 import { useState } from 'react';
 import { logoutAdmin } from '@/lib/admin-auth';
@@ -17,6 +18,10 @@ const navItems = [
   { label: 'Orders', href: '/admin/orders', icon: ShoppingBag, badge: true },
   { label: 'Menu', href: '/admin/menu', icon: UtensilsCrossed },
   { label: 'Tables', href: '/admin/tables', icon: Table2 },
+  { label: 'Staff', href: '/admin/staff', icon: Users },
+  { label: 'Inventory', href: '/admin/inventory', icon: Package },
+  { label: 'Reviews', href: '/admin/reviews', icon: Star },
+  { label: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export function AdminSidebar({ children }: { children: React.ReactNode }) {
@@ -74,6 +79,20 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
             </motion.span>
           )}
         </div>
+
+        {/* Search */}
+        {!collapsed && (
+          <div className="px-4 py-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full pl-9 pr-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Navigation */}
         <nav className="flex-1 py-4 space-y-1 overflow-y-auto px-2">
@@ -174,6 +193,16 @@ export function AdminSidebar({ children }: { children: React.ReactNode }) {
               <button onClick={() => setMobileOpen(false)} className="text-white/50 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
+            </div>
+            <div className="px-4 py-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full pl-9 pr-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/50 transition-all"
+                />
+              </div>
             </div>
             <nav className="flex-1 py-4 space-y-1 px-2 overflow-y-auto">
               {navItems.map((item) => {
