@@ -69,7 +69,7 @@ export function OrderManagement({ orders, onUpdateStatus, onViewDetails }: Order
               <div className="flex items-center gap-2">
                 <span className={cn('w-1.5 h-1.5 rounded-full', active ? 'bg-[#D4AF37]' : cfg.dot)} />
                 {cfg.label}
-                <span className={cn('px-1.5 py-0.5 rounded text-[10px]', active ? 'bg-[#D4AF37]/20' : 'bg-white/[0.06]')}>{statusCounts[status] || 0}</span>
+                <span className={cn('px-1.5 py-0.5 rounded text-xs', active ? 'bg-[#D4AF37]/20' : 'bg-white/[0.06]')}>{statusCounts[status] || 0}</span>
               </div>
             </button>
           );
@@ -114,10 +114,10 @@ export function OrderManagement({ orders, onUpdateStatus, onViewDetails }: Order
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-white">{order.customer}</p>
-                          <p className="text-[11px] text-white/40">Table {order.table} • {order.time}</p>
+                          <p className="text-xs text-white/40">Table {order.table} • {order.time}</p>
                         </div>
                       </div>
-                      <span className={cn('px-2.5 py-1 rounded-lg text-[10px] font-semibold border', cfg.bg, cfg.color, `border-${order.status}-500/20`)}>
+                      <span className={cn('px-2.5 py-1 rounded-lg text-xs font-semibold border', cfg.bg, cfg.color, `border-${order.status}-500/20`)}>
                         {cfg.label}
                       </span>
                     </div>
@@ -136,7 +136,7 @@ export function OrderManagement({ orders, onUpdateStatus, onViewDetails }: Order
                         </div>
                       ))}
                       {order.items.length > 4 && (
-                        <p className="text-[11px] text-[#D4AF37]/60">+{order.items.length - 4} more items</p>
+                        <p className="text-xs text-[#D4AF37]/60">+{order.items.length - 4} more items</p>
                       )}
                     </div>
                     {order.notes && (
