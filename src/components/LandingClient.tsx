@@ -357,6 +357,47 @@ export default function LandingClient({ initialSettings, initialFeatured }: Land
         </div>
       </section>
 
+      {/* Gallery */}
+      <section id="gallery" className="relative px-4 py-24 scroll-mt-20">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/3 via-transparent to-[#D4AF37]/3" />
+        <div className="relative max-w-6xl mx-auto">
+          <div className={`text-center mb-14 ${sectionHeaderClass(0)}`}>
+            <span className="text-[#D4AF37] text-sm font-semibold uppercase tracking-[0.3em]">Our Gallery</span>
+            <h2 className="text-3xl sm:text-5xl font-bold mt-3 mb-4">Visual <span className="text-[#D4AF37]">Experience</span></h2>
+            <p className="text-white/40 text-lg max-w-2xl mx-auto">A glimpse into the Bright Cafe &amp; Restaurant experience</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {[
+              { src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&auto=format&fit=crop&q=80', alt: 'Fine dining experience' },
+              { src: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&auto=format&fit=crop&q=80', alt: 'Gourmet plating' },
+              { src: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&auto=format&fit=crop&q=80', alt: 'Grilled dishes' },
+              { src: 'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=600&auto=format&fit=crop&q=80', alt: 'Fresh salads' },
+              { src: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=80', alt: 'Pizza straight from oven' },
+              { src: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=80', alt: 'Breakfast spread' },
+              { src: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=600&auto=format&fit=crop&q=80', alt: 'Pasta dishes' },
+              { src: 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=600&auto=format&fit=crop&q=80', alt: 'Elegant plating' },
+              { src: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=600&auto=format&fit=crop&q=80', alt: 'Pasta perfection' },
+              { src: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&auto=format&fit=crop&q=80', alt: 'Colorful dishes' },
+              { src: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&auto=format&fit=crop&q=80', alt: 'Dessert artistry' },
+              { src: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&auto=format&fit=crop&q=80', alt: 'Premium steak' },
+            ].map((img, i) => (
+              <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}
+                whileHover={{ scale: 1.03, zIndex: 10 }}
+                className={`relative overflow-hidden rounded-2xl ${i === 0 || i === 5 ? 'sm:col-span-2 sm:row-span-2' : ''}`}
+              >
+                <div className={`${i === 0 || i === 5 ? 'aspect-square' : 'aspect-[4/3]'}`}>
+                  <Image src={img.src} alt={img.alt} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className="object-cover hover:scale-110 transition-transform duration-700" loading="lazy" />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                  <p className="text-white text-sm font-medium">{img.alt}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section className="relative px-4 py-24">
         <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/3 via-transparent to-transparent" />
